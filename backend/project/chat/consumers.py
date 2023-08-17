@@ -97,7 +97,7 @@ class ChatConsumer(WebsocketConsumer):
                 {
                     'type': 'user_typing',
                     'typing': typing,
-                    'sender': self.scope['user'].username
+                    'sender': self.scope['user'].id
                 }
             )
         elif 'mark_message_as_read' in data_json:

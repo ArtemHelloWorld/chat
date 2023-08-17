@@ -9,6 +9,10 @@ import useAxios from '../../utils/useAxios';
 function PageChats({ selectedChat }) {
   const chatSocket = useRef();
   const [connected, setConnected] = useState(false);
+
+  const [isTyping, setIsTyping] = useState(false);
+  const [isCompanionTyping, setIsCompanionTyping] = useState(false);
+
   const [messageInput, setMessageInput] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
 
@@ -40,7 +44,7 @@ function PageChats({ selectedChat }) {
         chatSocket.current.close();
       }
     }
-    return new WebSocket(url)
+    return new WebSocket(url);
   }
 
   function loadWebSocket(chat_id){
@@ -58,6 +62,11 @@ function PageChats({ selectedChat }) {
         setChatMessages(prev => [...prev, data])
         console.log('onmessage', event.data)
       }
+      else if (data.type === 'user_typing'){
+        if (data.sender === selectedChat.id){
+            setIsCompanionTyping(data.typing);
+        }
+      }
     }
     chatSocket.current.onclose = (event) => {
       setConnected(false);
@@ -68,6 +77,22 @@ function PageChats({ selectedChat }) {
     }
   }
 
+  const sendTypingStatus = async () => {
+    if (connected){
+      chatSocket.current.send(JSON.stringify({
+        'typing': isTyping,
+      }))
+    }
+  }
+
+  const sendMessageInput = async () => {
+    if(connected && messageInput !== ''){
+      chatSocket.current.send(JSON.stringify({
+        'message': messageInput,
+      }))
+      setMessageInput('')
+    }
+  }
 
 
   useEffect(() => {
@@ -88,22 +113,25 @@ function PageChats({ selectedChat }) {
   }, [chatMessages]);
 
 
+  useEffect(() => {
+    sendTypingStatus();
+  }, [isTyping])
 
-
-  const sendMessageInput = async () => {
-    if(messageInput !== ''){
-      chatSocket.current.send(JSON.stringify({
-        'message': messageInput,
-      }))
-      setMessageInput('')
-    }
-  }
+  useEffect(() => {
+    sendTypingStatus();
+  }, [isTyping])
 
 
   if (selectedChat){
     return(
     <>
-          <h2 className="mt-3">{selectedChat.username}</h2>
+           <div className="header py-3">
+            <div className="container ">
+              <h1 className="mb-0">{selectedChat.username}</h1>
+              {isCompanionTyping && <small>Печатает...</small>}
+            </div>
+          </div>
+
           <div className="messages flex-grow-1 overflow-auto mb-3 px-5">
             <ul className="message-list list-unstyled d-flex flex-column gap-2 my-3 px-5">
               {chatMessages.map((message) => (
@@ -120,7 +148,11 @@ function PageChats({ selectedChat }) {
                     <li className={`message-left px-3 align-self-start w-65 ${message.is_read ? 'read' : ''}`} id={message.id}>
                       <div className="d-flex justify-content-start">
                         <div className="rounded-3 p-2 bg-secondary text-light text-start" style={{wordBreak: 'break-word'}}>{message.text}
-                          <div className="align-self-end"><small className="message-time d-flex justify-content-end">{message.time_sending}</small></div>
+                          <div className="align-self-end">
+                            <small className="message-time d-flex justify-content-end">
+                              {message.time_sending}
+                            </small>
+                          </div>
                         </div>
                       </div>
                     </li>
@@ -131,8 +163,18 @@ function PageChats({ selectedChat }) {
           </div>
           <div className="container">
             <div id="message-form" className="input-group input-group-lg mx-auto mb-3 justify-content-end w-50" >
-              <input id="message-input" type="text" name="message-input" className="form-control rounded-pill rounded-end" placeholder="Cообщение..." value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyDown={(event) => {event.key === 'Enter' && sendMessageInput()}}></input>
-              <button className="btn btn-primary rounded-pill rounded-start" onClick={sendMessageInput}>Отправить</button>
+              <input 
+                id="message-input" 
+                type="text" 
+                className="form-control rounded-pill rounded-end" 
+                placeholder="Cообщение..." 
+                value={messageInput}
+                onChange={event => {setMessageInput(event.target.value); setIsTyping(true); console.log('typing...')}}
+                onBlur={event => {setIsTyping(false); console.log('not typing')}}
+                onKeyDown={(event) => {event.key === 'Enter' && sendMessageInput()}}
+                >
+              </input>
+              <button onClick={sendMessageInput} className="btn btn-primary rounded-pill rounded-start">Отправить</button>
             </div>
           </div>
         </>
