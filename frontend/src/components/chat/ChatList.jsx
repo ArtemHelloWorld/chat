@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import useAxios from '../utils/useAxios';
+import useAxios from '../../utils/useAxios';
 
 export default function ChatList({ setSelectedChat }){
 
@@ -9,7 +9,7 @@ export default function ChatList({ setSelectedChat }){
 
 
   async function fetchChats() {
-    let response = await api.get('api/v1/users/');
+    let response = await api.get('api/v1/users/all/');
     if (response.status === 200){
       setChats(response.data)
     }

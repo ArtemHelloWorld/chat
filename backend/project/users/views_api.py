@@ -1,4 +1,5 @@
 import django.shortcuts
+from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -26,3 +27,11 @@ class UserInfoView(APIView):
             'email': user.email,
         }
         return Response(response_data)
+
+
+class UserRegisterView(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response(serializer.data)

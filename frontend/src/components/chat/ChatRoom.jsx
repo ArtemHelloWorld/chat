@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext }  from 'react'
-import { scrollDown } from '../utils/ScrollDown';
-import AuthContext from '../context/AuthContext';
-import useAxios from '../utils/useAxios';
+import { scrollDown } from '../../utils/ScrollDown';
+import AuthContext from '../../context/AuthContext';
+import useAxios from '../../utils/useAxios';
 
 
 
