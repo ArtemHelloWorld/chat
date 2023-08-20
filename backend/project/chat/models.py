@@ -1,5 +1,6 @@
 from django.db import models
 import users.models
+from datetime import datetime
 
 
 class Chat(models.Model):
@@ -21,10 +22,14 @@ class Message(models.Model):
     # todo: изменить на message и pk на id
     text = models.TextField(verbose_name='текст сообщения')
     is_read = models.BooleanField(default=False)
-    time_sending = models.DateTimeField(auto_now=True, verbose_name='время отправки сообщения')
+    sending_timestamp = models.PositiveBigIntegerField(verbose_name='время отправки сообщения')
+
+    def save(self, *args, **kwargs):
+        if not self.sending_timestamp:
+            self.sending_timestamp = int(datetime.now().timestamp() * 1000)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'сообщение'
         verbose_name_plural = 'сообщения'
-        ordering = ['time_sending']
-
+        ordering = ['sending_timestamp']

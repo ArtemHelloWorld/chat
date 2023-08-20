@@ -18,5 +18,5 @@ class MessageAdmin(django.contrib.admin.ModelAdmin):
         chat.models.Message.id.field.name,
         chat.models.Message.text.field.name,
         chat.models.Message.is_read.field.name,
-        chat.models.Message.time_sending.field.name,
+        chat.models.Message.sending_timestamp.field.name,
     )

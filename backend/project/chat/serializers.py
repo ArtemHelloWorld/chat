@@ -11,4 +11,4 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
 class MessageSerializer(rest_framework.serializers.ModelSerializer):
     class Meta:
         model = chat.models.Message
-        fields = ['id', 'sender', 'text', 'is_read', 'time_sending']
+        fields = ['id', 'sender', 'text', 'is_read', 'sending_timestamp']

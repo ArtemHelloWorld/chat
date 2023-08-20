@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useContext }  from 'react'
-import { scrollDown } from '../../utils/ScrollDown';
+import { scrollToElement } from '../../utils/ScrollDown';
 import AuthContext from '../../context/AuthContext';
 import useAxios from '../../utils/useAxios';
-
+import ChatRoomMessage from './ChatRoomMessage.jsx';
 
 
 
@@ -64,8 +64,13 @@ function PageChats({ selectedChat }) {
       }
       else if (data.type === 'user_typing'){
         if (data.sender === selectedChat.id){
+            //setTimeout(() => {setIsCompanionTyping(false);}, 2000)
             setIsCompanionTyping(data.typing);
         }
+      }
+      else if (data.type === 'mark_message_as_read'){
+        console.log(data.message_pk, 'dd')
+        setChatMessages(prev => [...prev.map(message => message.id===data.message_pk ? {...message, is_read: true}: {...message})])
       }
     }
     chatSocket.current.onclose = (event) => {
@@ -93,6 +98,13 @@ function PageChats({ selectedChat }) {
       setMessageInput('')
     }
   }
+  const markMessageAsRead = async (message) => {
+    if(connected){
+      chatSocket.current.send(JSON.stringify({
+            'mark_message_as_read': message.id,
+        }))
+    }
+  }
 
 
   useEffect(() => {
@@ -108,76 +120,55 @@ function PageChats({ selectedChat }) {
 
   useEffect(() => {
     if(chatMessages.length){
-      scrollDown('.messages');
-    } 
-  }, [chatMessages]);
+      scrollToElement('.messages', 'li.unread');
+    }
+  }, [connected]);
 
 
   useEffect(() => {
     sendTypingStatus();
   }, [isTyping])
 
-  useEffect(() => {
-    sendTypingStatus();
-  }, [isTyping])
 
-
-  if (selectedChat){
+  if (selectedChat && connected){
     return(
-    <>
-           <div className="header py-3">
-            <div className="container ">
-              <h1 className="mb-0">{selectedChat.username}</h1>
-              {isCompanionTyping && <small>Печатает...</small>}
-            </div>
+      <>
+        <div className="header py-3">
+          <div className="container ">
+            <h1 className="mb-0">{selectedChat.username}</h1>
+            {isCompanionTyping && <small>Печатает...</small>}
           </div>
+        </div>
 
-          <div className="messages flex-grow-1 overflow-auto mb-3 px-5">
-            <ul className="message-list list-unstyled d-flex flex-column gap-2 my-3 px-5">
-              {chatMessages.map((message) => (
-                <React.Fragment key={message.id}>
-                  {message.sender === user.user_id ? (
-                    <li className={`message-right px-3 align-self-end w-65 ${message.is_read ? 'read' : ''}`} id={message.id}>
-                      <div className="d-flex justify-content-end">
-                        <div className="rounded-3 p-2 bg-light text-black text-start" style={{wordBreak: 'break-word'}}>{message.text}
-                          <div className="align-self-end"><small className="-flex justify-content-end text-muted">{message.time_sending}</small></div>
-                        </div>
-                      </div>
-                    </li>
-                  ) : (
-                    <li className={`message-left px-3 align-self-start w-65 ${message.is_read ? 'read' : ''}`} id={message.id}>
-                      <div className="d-flex justify-content-start">
-                        <div className="rounded-3 p-2 bg-secondary text-light text-start" style={{wordBreak: 'break-word'}}>{message.text}
-                          <div className="align-self-end">
-                            <small className="message-time d-flex justify-content-end">
-                              {message.time_sending}
-                            </small>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  )}
-                </React.Fragment>
-              ))}
-            </ul>
+        <div className="messages flex-grow-1 overflow-auto mb-3 px-5">
+          <ul className="message-list list-unstyled d-flex flex-column gap-2 my-3 px-5">
+            {chatMessages.map((message) => (
+              <ChatRoomMessage
+                message={message}
+                onMessageRead={markMessageAsRead}
+                position={message.sender === user.user_id ? 'right': 'left'}
+              />
+            ))}
+          </ul>
+        </div>
+
+        <div className="container">
+          <div id="message-form" className="input-group input-group-lg mx-auto mb-3 justify-content-end w-50" >
+            <input
+              id="message-input"
+              type="text"
+              className="form-control rounded-pill rounded-end"
+              placeholder="Cообщение..."
+              value={messageInput}
+              onChange={event => {setMessageInput(event.target.value); setIsTyping(true); console.log('typing...')}}
+              onBlur={event => {setIsTyping(false); console.log('not typing')}}
+              onKeyDown={(event) => {event.key === 'Enter' && sendMessageInput()}}
+              >
+            </input>
+            <button onClick={sendMessageInput} className="btn btn-primary rounded-pill rounded-start">Отправить</button>
           </div>
-          <div className="container">
-            <div id="message-form" className="input-group input-group-lg mx-auto mb-3 justify-content-end w-50" >
-              <input 
-                id="message-input" 
-                type="text" 
-                className="form-control rounded-pill rounded-end" 
-                placeholder="Cообщение..." 
-                value={messageInput}
-                onChange={event => {setMessageInput(event.target.value); setIsTyping(true); console.log('typing...')}}
-                onBlur={event => {setIsTyping(false); console.log('not typing')}}
-                onKeyDown={(event) => {event.key === 'Enter' && sendMessageInput()}}
-                >
-              </input>
-              <button onClick={sendMessageInput} className="btn btn-primary rounded-pill rounded-start">Отправить</button>
-            </div>
-          </div>
-        </>
+        </div>
+      </>
     )
   }
   else{

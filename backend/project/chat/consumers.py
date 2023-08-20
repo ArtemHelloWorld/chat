@@ -67,8 +67,9 @@ class ChatConsumer(WebsocketConsumer):
                 {
                     'type': 'chat_message',
                     'pk': message_bd.pk,
-                    'text': message,
-                    'sender': self.scope['user'].id
+                    'text': message_bd.text,
+                    'sender': message_bd.sender.id,
+                    'sending_timestamp': message_bd.sending_timestamp
                 }
             )
 
@@ -130,8 +131,7 @@ class ChatConsumer(WebsocketConsumer):
                     'id': event.get('pk'),
                     'text': event.get('text'),
                     'sender': event.get('sender'),
-                    'current_date': current_date,
-                    'time_sending': current_time,
+                    'sending_timestamp': event.get('sending_timestamp'),
                 }
             )
         )
