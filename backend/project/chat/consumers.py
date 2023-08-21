@@ -3,6 +3,7 @@ import json
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django.utils import timezone
+from django_eventstream import send_event, get_events
 
 import chat.models
 
@@ -61,17 +62,22 @@ class ChatConsumer(WebsocketConsumer):
                 sender=self.scope['user'],
                 text=message
             )
-
-            async_to_sync(self.channel_layer.group_send)(
-                self.chat_group_name,
-                {
+            data = {
                     'type': 'chat_message',
                     'pk': message_bd.pk,
                     'text': message_bd.text,
                     'sender': message_bd.sender.id,
                     'sending_timestamp': message_bd.sending_timestamp
                 }
-            )
+            self.chat_.last_message = f'{ message_bd.sender.username}: {message_bd.text}'
+            self.chat_.save()
+            chat_data = {
+                            'id': self.chat_.id,
+                            'last_message': self.chat_.last_message,
+                        }
+            send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
+            send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
+            async_to_sync(self.channel_layer.group_send)(self.chat_group_name, data)
 
         # elif 'heartbeat' in data_json:
         #     heartbeat = data_json.get('heartbeat')
@@ -92,6 +98,18 @@ class ChatConsumer(WebsocketConsumer):
         elif 'typing' in data_json:
             typing = data_json.get('typing')
             print(f'Typing: {typing}')
+
+            if typing:
+                self.chat_.status = f'{ self.scope["user"].username} печатает...'
+            else:
+                self.chat_.status = None
+            self.chat_.save()
+            chat_data = {
+                'id': self.chat_.id,
+                'status': self.chat_.status,
+            }
+            send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
+            send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
 
             async_to_sync(self.channel_layer.group_send)(
                 self.chat_group_name,
@@ -120,21 +138,15 @@ class ChatConsumer(WebsocketConsumer):
 
     def chat_message(self, event):
         # Отправка события 'новое сообщение'
-        timezone_now = timezone.now()
-        current_date = timezone_now.strftime('%d.%m.%y')
-        current_time = timezone_now.strftime('%H:%M')
-
-        self.send(
-            text_data=json.dumps(
-                {
+        data = {
                     'type': 'chat',
                     'id': event.get('pk'),
                     'text': event.get('text'),
                     'sender': event.get('sender'),
                     'sending_timestamp': event.get('sending_timestamp'),
                 }
-            )
-        )
+
+        self.send(text_data=json.dumps(data))
 
     # def heart_beating(self, event):
     #     # Отправка события о том, что пользователь онлайн

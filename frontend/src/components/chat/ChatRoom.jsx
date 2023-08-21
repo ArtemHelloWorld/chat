@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext }  from 'react'
-import { scrollToElement } from '../../utils/ScrollDown';
+import { scrollToElement, scrollDown } from '../../utils/ScrollDown';
 import AuthContext from '../../context/AuthContext';
 import useAxios from '../../utils/useAxios';
 import ChatRoomMessage from './ChatRoomMessage.jsx';
@@ -9,6 +9,7 @@ import ChatRoomMessage from './ChatRoomMessage.jsx';
 function PageChats({ selectedChat }) {
   const chatSocket = useRef();
   const [connected, setConnected] = useState(false);
+  const [toScrollDown, setToScrollDown] = useState(false);
 
   const [isTyping, setIsTyping] = useState(false);
   const [isCompanionTyping, setIsCompanionTyping] = useState(false);
@@ -21,16 +22,16 @@ function PageChats({ selectedChat }) {
 
 
 
-  async function fetchChatId() {
-    let response = await api.get(`api/v1/chat/user/${selectedChat.username}/`);
-    if (response.status === 200){
-      return response.data.id;
-    }
-  }
+  // async function fetchChatId() {
+  //   let response = await api.get(`api/v1/chat/user/${selectedChat.companion.username}/`);
+  //   if (response.status === 200){
+  //     return response.data.id;
+  //   }
+  // }
 
 
   async function fetchMessages() {
-    let response = await api.get(`api/v1/chat/user/${selectedChat.username}/messages/`);
+    let response = await api.get(`api/v1/chat/${selectedChat.id}/messages/`);
     if (response.status === 200){
       return response.data;
     }
@@ -59,8 +60,9 @@ function PageChats({ selectedChat }) {
       const data = JSON.parse(event.data);
 
       if(data.type === 'chat'){
-        setChatMessages(prev => [...prev, data])
         console.log('onmessage', event.data)
+        setChatMessages(prev => [...prev, data]);
+        setToScrollDown(true);
       }
       else if (data.type === 'user_typing'){
         if (data.sender === selectedChat.id){
@@ -95,7 +97,8 @@ function PageChats({ selectedChat }) {
       chatSocket.current.send(JSON.stringify({
         'message': messageInput,
       }))
-      setMessageInput('')
+      setIsTyping(false);
+      setMessageInput('');
     }
   }
   const markMessageAsRead = async (message) => {
@@ -109,9 +112,9 @@ function PageChats({ selectedChat }) {
 
   useEffect(() => {
     if (selectedChat){
-      console.log('ФЕТЧИМ ЧАТ ID И СОЗДАЕМ WS');
-      fetchChatId().then(chat_id => loadWebSocket(chat_id));
-
+      // console.log('ФЕТЧИМ ЧАТ ID И СОЗДАЕМ WS');
+      // fetchChatId().then(chat_id => loadWebSocket(chat_id));
+      loadWebSocket(selectedChat.id)
       console.log('ФЕТЧИМ СООБЩЕНИЯ', selectedChat);
       fetchMessages().then(messages => setChatMessages(messages));
     }
@@ -124,6 +127,11 @@ function PageChats({ selectedChat }) {
     }
   }, [connected]);
 
+  // todo: called twice. figure out how to fix it
+  useEffect(() => {
+    scrollDown('.messages', true);
+    setToScrollDown(false);
+  }, [toScrollDown]);
 
   useEffect(() => {
     sendTypingStatus();
@@ -135,7 +143,7 @@ function PageChats({ selectedChat }) {
       <>
         <div className="header py-3">
           <div className="container ">
-            <h1 className="mb-0">{selectedChat.username}</h1>
+            <h1 className="mb-0">{selectedChat.companion.username}</h1>
             {isCompanionTyping && <small>Печатает...</small>}
           </div>
         </div>
@@ -144,6 +152,7 @@ function PageChats({ selectedChat }) {
           <ul className="message-list list-unstyled d-flex flex-column gap-2 my-3 px-5">
             {chatMessages.map((message) => (
               <ChatRoomMessage
+                key={message.id}
                 message={message}
                 onMessageRead={markMessageAsRead}
                 position={message.sender === user.user_id ? 'right': 'left'}

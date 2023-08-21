@@ -7,28 +7,23 @@ function scrollToElement(listQuerySelector, elementQuerySelector) {
     if (unreadItem) {
       messageList.scrollTo({
         top: unreadItem.offsetTop - messageList.clientHeight,
+        behavior: 'instant'
       });
     } else {
       scrollDown(listQuerySelector)
     }
   }
 }
-function scrollDown(listQuerySelector) {
+function scrollDown(listQuerySelector, smooth=false) {
   const messageList = document.querySelector(listQuerySelector)
-  messageList.scrollTo({
-    top: messageList.scrollHeight,
-  });
-}
-function scrollDownSmooth(querySelector, smooth=true) {
-    var messageList = document.querySelector(querySelector)
-    if (messageList){
-      const lastMessage = messageList.lastElementChild;
-        lastMessage.scrollIntoView({ behavior: 'smooth' });
-        
-        messageList.scrollTop =  messageList.scrollHeight
-    }     
+  let behavior = smooth ? 'smooth' : 'instant'
+  if (messageList) {
+    messageList.scrollTo({
+      top: messageList.scrollHeight,
+      behavior: behavior
+    });
+  }
 }
 
 
-
-export {scrollToElement, scrollDown, scrollDownSmooth}
+export {scrollToElement, scrollDown}

@@ -6,6 +6,8 @@ from datetime import datetime
 class Chat(models.Model):
     user1 = models.ForeignKey(users.models.User, on_delete=models.CASCADE, related_name='user1')
     user2 = models.ForeignKey(users.models.User, on_delete=models.CASCADE, related_name='user2')
+    last_message = models.TextField(default='', verbose_name='последнее сообщение')
+    status = models.TextField(null=True, default=None, verbose_name='статус, например, что пользователь печатает')
     time_created = models.DateTimeField(auto_now=True, verbose_name='время создания чата')
 
     def __str__(self):

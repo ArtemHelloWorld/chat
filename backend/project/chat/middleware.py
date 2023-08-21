@@ -26,7 +26,7 @@ def get_user(validated_token):
         user = users.models.User.objects.get(id=validated_token['user_id'])
         return user
     except:
-        return AnonymousUser()
+        return None
 
 
 class QueryAuthMiddleware:
@@ -68,7 +68,10 @@ class JwtAuthMiddleware(BaseMiddleware):
             return None
         else:
             decoded_data = jwt_decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-            scope['user'] = await get_user(validated_token=decoded_data)
+            user = await get_user(validated_token=decoded_data)
+            if not user:
+                return HttpResponseNotFound
+            scope['user'] = user
         return await super().__call__(scope, receive, send)
 
 

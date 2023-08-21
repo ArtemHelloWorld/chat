@@ -11,6 +11,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-w30sdst!pi!e$n00rf4iu@')
 
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1')
 
+EVENTSTREAM_ALLOW_ORIGIN = '*'
+
 ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS',
     '127.0.0.1',
@@ -24,6 +26,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'channels',
+    'django_eventstream',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -40,6 +43,7 @@ CHANNEL_LAYERS = {
     }
 }
 MIDDLEWARE = [
+    'django_grip.GripMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

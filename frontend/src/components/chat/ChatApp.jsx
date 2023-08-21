@@ -6,7 +6,7 @@ import ChatRoom from './ChatRoom.jsx';
 
 async function fetchUserData(username) {
     const api = useAxios();
-    let response = await api.get(`api/v1/user/${username}/`);
+    let response = await api.get(`api/v1/chat/user/${username}/`);
       if (response.status === 200){
         return response.data;
       }
@@ -29,7 +29,7 @@ const ChatPage = () => {
                     <ChatList setSelectedChat={setSelectedChat}/>
                 </div>
                 <div className="col-md-9 h-100 d-flex flex-column p-0">
-                    <ChatRoom    selectedChat={selectedChat}/>
+                    <ChatRoom selectedChat={selectedChat}/>
                 </div>
             </div>
         </div>
