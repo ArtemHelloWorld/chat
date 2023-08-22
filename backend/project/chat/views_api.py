@@ -24,12 +24,18 @@ class ChatAll(rest_framework.generics.ListAPIView):
         ).annotate(
             companion=Case(
                 When(user1=sender, then=JSONObject(
+                    id=F('user2__id'),
                     username=F('user2__username'),
-                    email=F('user2__email')
+                    email=F('user2__email'),
+                    is_online=F('user2__is_online'),
+                    last_online=F('user2__last_online'),
                 )),
                 When(user2=sender, then=JSONObject(
+                    id=F('user1__id'),
                     username=F('user1__username'),
-                    email=F('user1__email')
+                    email=F('user1__email'),
+                    is_online=F('user1__is_online'),
+                    last_online=F('user1__last_online'),
                 )),
                 output_field=JSONField()
             )
@@ -54,7 +60,13 @@ class ChatUserInfoView(rest_framework.generics.RetrieveAPIView):
                 user1=sender,
                 user2=receiver,
             )
-        chat_obj.companion = {'username': receiver.username, 'email': receiver.email}
+        chat_obj.companion = {
+            'id': receiver.id,
+            'username': receiver.username,
+            'email': receiver.email,
+            'is_online': receiver.is_online,
+            'last_online': receiver.last_online,
+        }
 
         return chat_obj
 

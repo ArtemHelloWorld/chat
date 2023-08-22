@@ -3,7 +3,8 @@ import { scrollToElement, scrollDown } from '../../utils/ScrollDown';
 import AuthContext from '../../context/AuthContext';
 import useAxios from '../../utils/useAxios';
 import ChatRoomMessage from './ChatRoomMessage.jsx';
-
+import timestampToTimezone from "../../utils/timestampToTimezone.js";
+import TimestampToTimezone from "../../utils/timestampToTimezone.js";
 
 
 function PageChats({ selectedChat }) {
@@ -12,6 +13,7 @@ function PageChats({ selectedChat }) {
   const [toScrollDown, setToScrollDown] = useState(false);
 
   const [isTyping, setIsTyping] = useState(false);
+  const [companion, setCompanion] = useState({})
   const [isCompanionTyping, setIsCompanionTyping] = useState(false);
 
   const [messageInput, setMessageInput] = useState('');
@@ -64,8 +66,15 @@ function PageChats({ selectedChat }) {
         setChatMessages(prev => [...prev, data]);
         setToScrollDown(true);
       }
+      else if (data.type === 'online_status') {
+        console.log(data, selectedChat.companion.id)
+        if (data.sender === selectedChat.companion.id) {
+          selectedChat.companion = {...selectedChat.companion, is_online: data.is_online, last_online: data.last_online}
+          setCompanion(selectedChat.companion)
+        }
+      }
       else if (data.type === 'user_typing'){
-        if (data.sender === selectedChat.id){
+        if (data.sender === selectedChat.companion.id){
             //setTimeout(() => {setIsCompanionTyping(false);}, 2000)
             setIsCompanionTyping(data.typing);
         }
@@ -114,6 +123,7 @@ function PageChats({ selectedChat }) {
     if (selectedChat){
       // console.log('ФЕТЧИМ ЧАТ ID И СОЗДАЕМ WS');
       // fetchChatId().then(chat_id => loadWebSocket(chat_id));
+      setCompanion(selectedChat.companion)
       loadWebSocket(selectedChat.id)
       console.log('ФЕТЧИМ СООБЩЕНИЯ', selectedChat);
       fetchMessages().then(messages => setChatMessages(messages));
@@ -143,8 +153,9 @@ function PageChats({ selectedChat }) {
       <>
         <div className="header py-3">
           <div className="container ">
-            <h1 className="mb-0">{selectedChat.companion.username}</h1>
-            {isCompanionTyping && <small>Печатает...</small>}
+            <h1 className="mb-0">{companion.username}</h1>
+            {isCompanionTyping && <p><small>Печатает...</small></p>}
+            <p><small>{companion.is_online ? 'Онлайн' : `Был онлайн ${TimestampToTimezone(companion.last_online).toFormat('yyyy-MM-dd в HH:mm')}`}</small></p>
           </div>
         </div>
 

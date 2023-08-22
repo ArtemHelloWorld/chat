@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
@@ -9,6 +10,21 @@ import chat.models
 
 
 class ChatConsumer(WebsocketConsumer):
+    def update_online_status(self, online_status):
+        self.scope['user'].is_online = online_status
+        self.scope['user'].last_online = int(datetime.now().timestamp() * 1000)
+        self.scope['user'].save()
+
+        async_to_sync(self.channel_layer.group_send)(
+            self.chat_group_name,
+            {
+                'type': 'online_status',
+                'sender': self.scope['user'].id,
+                'is_online': self.scope['user'].is_online,
+                'last_online': self.scope['user'].last_online,
+            }
+        )
+
     def connect(self):
         print('connected')
 
@@ -21,28 +37,13 @@ class ChatConsumer(WebsocketConsumer):
             self.channel_name
         )
         self.accept()
-        # async_to_sync(self.channel_layer.group_send)(
-        #     self.chat_group_name,
-        #     {
-        #         'type': 'heart_beating',
-        #         'heartbeat': True,
-        #         'sender': self.scope['user'].username
-        #     }
-        # )
-        self.scope['user'].last_online = timezone.now()
-        self.scope['user'].save()
+
+        self.update_online_status(online_status=True)
 
     def disconnect(self, close_code):
         print('disconnected')
 
-        # async_to_sync(self.channel_layer.group_send)(
-        #     self.chat_group_name,
-        #     {
-        #         'type': 'heart_beating',
-        #         'heartbeat': False,
-        #         'sender': self.scope['user'].username
-        #     }
-        # )
+        self.update_online_status(online_status=False)
 
         async_to_sync(self.channel_layer.group_discard)(
             self.chat_group_name,
@@ -63,44 +64,28 @@ class ChatConsumer(WebsocketConsumer):
                 text=message
             )
             data = {
-                    'type': 'chat_message',
-                    'pk': message_bd.pk,
-                    'text': message_bd.text,
-                    'sender': message_bd.sender.id,
-                    'sending_timestamp': message_bd.sending_timestamp
-                }
-            self.chat_.last_message = f'{ message_bd.sender.username}: {message_bd.text}'
+                'type': 'chat_message',
+                'pk': message_bd.pk,
+                'text': message_bd.text,
+                'sender': message_bd.sender.id,
+                'sending_timestamp': message_bd.sending_timestamp
+            }
+            self.chat_.last_message = f'{message_bd.sender.username}: {message_bd.text}'
             self.chat_.save()
             chat_data = {
-                            'id': self.chat_.id,
-                            'last_message': self.chat_.last_message,
-                        }
+                'id': self.chat_.id,
+                'last_message': self.chat_.last_message,
+            }
             send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
             send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
             async_to_sync(self.channel_layer.group_send)(self.chat_group_name, data)
 
-        # elif 'heartbeat' in data_json:
-        #     heartbeat = data_json.get('heartbeat')
-        #     print(f'heartbeat {self.scope["user"].username} {heartbeat}')
-        #
-        #     if heartbeat:
-        #         self.scope['user'].last_online = timezone.now()
-        #         self.scope['user'].save()
-        #
-        #     async_to_sync(self.channel_layer.group_send)(
-        #         self.chat_group_name,
-        #         {
-        #             'type': 'heart_beating',
-        #             'heartbeat': heartbeat,
-        #             'sender': self.scope['user'].username
-        #         }
-        #     )
         elif 'typing' in data_json:
             typing = data_json.get('typing')
             print(f'Typing: {typing}')
 
             if typing:
-                self.chat_.status = f'{ self.scope["user"].username} печатает...'
+                self.chat_.status = f'{self.scope["user"].username} печатает...'
             else:
                 self.chat_.status = None
             self.chat_.save()
@@ -136,29 +121,26 @@ class ChatConsumer(WebsocketConsumer):
                 }
             )
 
+    def online_status(self, event):
+        data = {
+            'type': 'online_status',
+            'sender': event.get('sender'),
+            'is_online': event.get('is_online'),
+            'last_online': event.get('last_online'),
+        }
+        self.send(text_data=json.dumps(data))
+
     def chat_message(self, event):
         # Отправка события 'новое сообщение'
         data = {
-                    'type': 'chat',
-                    'id': event.get('pk'),
-                    'text': event.get('text'),
-                    'sender': event.get('sender'),
-                    'sending_timestamp': event.get('sending_timestamp'),
-                }
+            'type': 'chat',
+            'id': event.get('pk'),
+            'text': event.get('text'),
+            'sender': event.get('sender'),
+            'sending_timestamp': event.get('sending_timestamp'),
+        }
 
         self.send(text_data=json.dumps(data))
-
-    # def heart_beating(self, event):
-    #     # Отправка события о том, что пользователь онлайн
-    #     self.send(
-    #         text_data=json.dumps(
-    #             {
-    #                 'type': 'heart_beating',
-    #                 'heartbeat': event.get('heartbeat'),
-    #                 'sender': event.get('sender')
-    #             }
-    #         )
-    #     )
 
     def user_typing(self, event):
         # Отправка события о том, что пользователь начал или закончил печатать
