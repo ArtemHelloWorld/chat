@@ -16,8 +16,8 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes >
-          <Route exact path="/login/" element={<LoginPage />}  />
-          <Route exact path="/signup/" element={<SignUpPage />}  />
+          <Route exact path="/login/" element={<LoginPage/>}/>
+          <Route exact path="/signup/" element={<SignUpPage/>}/>
           <Route path="/" element={<PrivateRoute><ChatApp/></PrivateRoute>}/>
         </Routes>
       </AuthProvider>

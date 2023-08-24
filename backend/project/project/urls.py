@@ -1,3 +1,4 @@
+import django.conf.urls.static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
@@ -12,3 +13,8 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 ]
+
+urlpatterns += django.conf.urls.static.static(
+    django.conf.settings.MEDIA_URL,
+    document_root=django.conf.settings.MEDIA_ROOT,
+)

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import useAxios from '../../utils/useAxios';
 
+import LeftPanel from './leftPanel/LeftPanel.jsx';
 import ChatList from './ChatList.jsx';
 import ChatRoom from './ChatRoom.jsx';
 
-async function fetchUserData(username) {
+async function fetchChat(username) {
     const api = useAxios();
     let response = await api.get(`api/v1/chat/user/${username}/`);
       if (response.status === 200){
@@ -18,7 +19,7 @@ const ChatPage = () => {
 
     if (!selectedChat && window.location.hash){
         let username = window.location.hash.replace('#', '');
-        fetchUserData(username).then(chat => setSelectedChat(chat))
+        fetchChat(username).then(chat => setSelectedChat(chat))
     }
 
 
@@ -26,7 +27,7 @@ const ChatPage = () => {
         <div className="container-fluid h-100">
             <div className="row h-100">
                 <div className="col-md-3 h-100 overflow-auto p-0">
-                    <ChatList setSelectedChat={setSelectedChat}/>
+                    <LeftPanel setSelectedChat={setSelectedChat}/>
                 </div>
                 <div className="col-md-9 h-100 d-flex flex-column p-0">
                     <ChatRoom selectedChat={selectedChat}/>

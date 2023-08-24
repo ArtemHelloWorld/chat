@@ -10,7 +10,7 @@ const baseURL = "http://127.0.0.1:8000/"
 
 
 const useAxios = () => {
-    const {accessToken, refreshToken, logoutUser} = useContext(AuthContext);
+    const {accessToken} = useContext(AuthContext);
     
     const AxiosInstance = axios.create({
       baseURL, 

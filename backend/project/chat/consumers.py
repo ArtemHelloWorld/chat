@@ -7,14 +7,17 @@ from django.utils import timezone
 from django_eventstream import send_event, get_events
 
 import chat.models
+import users.models
 
 
 class ChatConsumer(WebsocketConsumer):
     def update_online_status(self, online_status):
-        self.scope['user'].is_online = online_status
-        self.scope['user'].last_online = int(datetime.now().timestamp() * 1000)
-        self.scope['user'].save()
+        user = users.models.User.objects.get(pk=self.scope['user'].pk)
+        user.is_online = online_status
+        user.last_online = int(datetime.now().timestamp() * 1000)
+        user.save()
 
+        self.scope['user'] = user
         async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
             {
@@ -70,7 +73,7 @@ class ChatConsumer(WebsocketConsumer):
                 'sender': message_bd.sender.id,
                 'sending_timestamp': message_bd.sending_timestamp
             }
-            self.chat_.last_message = f'{message_bd.sender.username}: {message_bd.text}'
+            self.chat_.last_message = f'{message_bd.text}'
             self.chat_.save()
             chat_data = {
                 'id': self.chat_.id,

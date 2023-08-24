@@ -3,8 +3,7 @@ import django.db.models
 import django.shortcuts
 import rest_framework.generics
 import rest_framework.permissions
-from django.db import models
-from django.db.models import Q, Case, When, F, CharField, Value, JSONField
+from django.db.models import Case, When, F, JSONField
 from django.db.models.functions import JSONObject
 
 import chat.models
@@ -19,26 +18,31 @@ class ChatAll(rest_framework.generics.ListAPIView):
     def get_queryset(self):
         sender = self.request.user
         # todo: вынести select related  в общий функциоал
-        chat_list = chat.models.Chat.objects.filter(
+        chat_list = (chat.models.Chat.objects.filter(
             (django.db.models.Q(user1=sender) | django.db.models.Q(user2=sender))
-        ).annotate(
-            companion=Case(
-                When(user1=sender, then=JSONObject(
-                    id=F('user2__id'),
-                    username=F('user2__username'),
-                    email=F('user2__email'),
-                    is_online=F('user2__is_online'),
-                    last_online=F('user2__last_online'),
-                )),
-                When(user2=sender, then=JSONObject(
-                    id=F('user1__id'),
-                    username=F('user1__username'),
-                    email=F('user1__email'),
-                    is_online=F('user1__is_online'),
-                    last_online=F('user1__last_online'),
-                )),
-                output_field=JSONField()
-            )
+        )
+            # .annotate(
+            #     companion=Case(
+            #         When(user1=sender, then=JSONObject(
+            #             id=F('user2__id'),
+            #             username=F('user2__username'),
+            #             email=F('user2__email'),
+            #             is_online=F('user2__is_online'),
+            #             last_online=F('user2__last_online'),
+            #             profile_image=F('user2__profile_image__url'),
+            #
+            #         )),
+            #         When(user2=sender, then=JSONObject(
+            #             id=F('user1__id'),
+            #             username=F('user1__username'),
+            #             email=F('user1__email'),
+            #             is_online=F('user1__is_online'),
+            #             last_online=F('user1__last_online'),
+            #             profile_image=F('user1__profile_image__url'),
+            #         )),
+            #         output_field=JSONField()
+            #     )
+            #     )
         )
         return chat_list
 
@@ -60,13 +64,14 @@ class ChatUserInfoView(rest_framework.generics.RetrieveAPIView):
                 user1=sender,
                 user2=receiver,
             )
-        chat_obj.companion = {
-            'id': receiver.id,
-            'username': receiver.username,
-            'email': receiver.email,
-            'is_online': receiver.is_online,
-            'last_online': receiver.last_online,
-        }
+        # chat_obj.companion = {
+        #     'id': receiver.id,
+        #     'username': receiver.username,
+        #     'email': receiver.email,
+        #     'is_online': receiver.is_online,
+        #     'last_online': receiver.last_online,
+        #     'profile_image': receiver.profile_image.url,
+        # }
 
         return chat_obj
 

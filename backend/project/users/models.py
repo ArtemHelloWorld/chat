@@ -1,11 +1,10 @@
 import django.contrib.auth.models
 import django.db.models
-from django.utils import timezone
 
 
 class User(django.contrib.auth.models.AbstractUser):
-    bio = django.db.models.TextField(verbose_name='о себе', help_text='Напишите немного о себе', null=True, blank=True)
-    image = django.db.models.ImageField(verbose_name='фотография', help_text='Выберете фотографию профиля', null=True, blank=True)
+    bio = django.db.models.TextField(verbose_name='о себе', null=True, blank=True)
+    profile_image = django.db.models.ImageField(upload_to='profile_images/%Y/%m/%d', verbose_name='фотография', null=True, blank=True, default='profile_images/default.png')
     is_online = django.db.models.BooleanField(default=False, verbose_name='статус онлайна')
     last_online = django.db.models.PositiveBigIntegerField(default=0, verbose_name='последний раз онлайн')
 

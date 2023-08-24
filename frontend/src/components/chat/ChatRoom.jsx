@@ -3,7 +3,6 @@ import { scrollToElement, scrollDown } from '../../utils/ScrollDown';
 import AuthContext from '../../context/AuthContext';
 import useAxios from '../../utils/useAxios';
 import ChatRoomMessage from './ChatRoomMessage.jsx';
-import timestampToTimezone from "../../utils/timestampToTimezone.js";
 import TimestampToTimezone from "../../utils/timestampToTimezone.js";
 
 
@@ -22,14 +21,6 @@ function PageChats({ selectedChat }) {
   const {user, accessToken} = useContext(AuthContext);
   const api = useAxios();
 
-
-
-  // async function fetchChatId() {
-  //   let response = await api.get(`api/v1/chat/user/${selectedChat.companion.username}/`);
-  //   if (response.status === 200){
-  //     return response.data.id;
-  //   }
-  // }
 
 
   async function fetchMessages() {
@@ -75,12 +66,11 @@ function PageChats({ selectedChat }) {
       }
       else if (data.type === 'user_typing'){
         if (data.sender === selectedChat.companion.id){
-            //setTimeout(() => {setIsCompanionTyping(false);}, 2000)
+            // todo: setTimeout(() => {setIsCompanionTyping(false);}, 2000)
             setIsCompanionTyping(data.typing);
         }
       }
       else if (data.type === 'mark_message_as_read'){
-        console.log(data.message_pk, 'dd')
         setChatMessages(prev => [...prev.map(message => message.id===data.message_pk ? {...message, is_read: true}: {...message})])
       }
     }
@@ -151,9 +141,19 @@ function PageChats({ selectedChat }) {
   if (selectedChat && connected){
     return(
       <>
-        <div className="header py-3">
-          <div className="container ">
-            <h1 className="mb-0">{companion.username}</h1>
+        <div className="room-header d-flex flex-row align-items-center py-3 px-5">
+          <img
+            src={
+              companion.profile_image.indexOf('http') === -1
+                ? 'http://127.0.0.1:8000' + companion.profile_image
+                : companion.profile_image
+            }
+            alt=""
+            className="img-fluid"
+            style={{ height: '3rem', width: 'auto' }}
+          />
+          <div className="mx-3">
+            <h1 className="p-0 m-0">{companion.username}</h1>
             {isCompanionTyping && <p><small>Печатает...</small></p>}
             <p><small>{companion.is_online ? 'Онлайн' : `Был онлайн ${TimestampToTimezone(companion.last_online).toFormat('yyyy-MM-dd в HH:mm')}`}</small></p>
           </div>
