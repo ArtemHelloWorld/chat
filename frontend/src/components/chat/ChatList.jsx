@@ -15,6 +15,15 @@ export default function ChatList({ setSelectedChat }){
       return response.data
     }
   }
+  async function getMessageInfo(message_id) {
+    if (message_id) {
+      let response = await api.get(`api/v1/message/${message_id}/`);
+      if (response.status === 200) {
+        return response.data
+      }
+    }
+    return null
+  }
 
 
   useEffect(() => {
@@ -33,8 +42,8 @@ export default function ChatList({ setSelectedChat }){
     eventSource.onmessage = (event) => {
        const data = JSON.parse(event.data);
        console.log('eventSource message:', data);
-       if ('last_message' in data){
-         setChats(prev => [...prev.map(chat => chat.id === data.id ? {...chat, last_message: `${data.last_message}`} : {...chat})])
+       if ('last_message_info' in data){
+         setChats(prev => [...prev.map(chat => chat.id === data.id ? {...chat, last_message_info: data.last_message_info} : {...chat})])
        }
        else if ('status' in data){
          // todo: проверить, что печатаешь не ты
@@ -87,7 +96,7 @@ export default function ChatList({ setSelectedChat }){
                     <div className="d-flex flex-column h-100">
                       <h4 className="user-username overflow-hidden text-truncate align-self-start">{chat.companion.username}</h4>
                       <p className="user-description overflow-hidden text-truncate align-self-start">
-                        {chat.status !== null ? chat.status : chat.last_message}
+                        {chat.status !== null ? chat.status : (chat.last_message_info ? chat.last_message_info.text: '')}
                       </p>
                     </div>
                   </div>

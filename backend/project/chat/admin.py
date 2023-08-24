@@ -8,7 +8,9 @@ class ChatAdmin(django.contrib.admin.ModelAdmin):
         chat.models.Chat.id.field.name,
         chat.models.Chat.user1.field.name,
         chat.models.Chat.user2.field.name,
-        chat.models.Chat.time_created.field.name,
+        chat.models.Chat.last_message.field.name,
+        chat.models.Chat.status.field.name,
+        chat.models.Chat.created_timestamp.field.name,
     )
 
 

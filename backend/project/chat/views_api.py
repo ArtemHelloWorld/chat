@@ -3,8 +3,6 @@ import django.db.models
 import django.shortcuts
 import rest_framework.generics
 import rest_framework.permissions
-from django.db.models import Case, When, F, JSONField
-from django.db.models.functions import JSONObject
 
 import chat.models
 import chat.serializers
@@ -103,3 +101,10 @@ class ChatMessagesInfoView(rest_framework.generics.ListCreateAPIView):
     def get_queryset(self):
         chat_obj = django.shortcuts.get_object_or_404(chat.models.Chat, id=self.kwargs['chat_id'])
         return chat.models.Message.objects.filter(chat=chat_obj)
+
+
+class MessagesInfoView(rest_framework.generics.RetrieveAPIView):
+    # todo: проверить что пользователю доступно это сообщение
+    permission_classes = [rest_framework.permissions.IsAuthenticated]
+    serializer_class = chat.serializers.MessageSerializer
+    lookup_url_kwarg = 'message_id'

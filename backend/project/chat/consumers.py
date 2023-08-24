@@ -3,10 +3,10 @@ from datetime import datetime
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
-from django.utils import timezone
-from django_eventstream import send_event, get_events
+from django_eventstream import send_event
 
 import chat.models
+import chat.serializers
 import users.models
 
 
@@ -73,11 +73,11 @@ class ChatConsumer(WebsocketConsumer):
                 'sender': message_bd.sender.id,
                 'sending_timestamp': message_bd.sending_timestamp
             }
-            self.chat_.last_message = f'{message_bd.text}'
+            self.chat_.last_message = message_bd
             self.chat_.save()
             chat_data = {
                 'id': self.chat_.id,
-                'last_message': self.chat_.last_message,
+                'last_message_info': chat.serializers.MessageSerializer(message_bd).data,
             }
             send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
             send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
