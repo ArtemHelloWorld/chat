@@ -59,7 +59,7 @@ export const AuthProvider = ({children}) => {
             return {password: 'Пароли не совпадают'}
         }
       
-        let response =  await fetch('http://localhost:8000/api/v1/account/register/',
+        let response =  await fetch('http://localhost:8000/api/v1/user/register/',
             {
             method: 'POST',
             headers: {

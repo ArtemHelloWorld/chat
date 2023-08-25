@@ -15,15 +15,7 @@ export default function ChatList({ setSelectedChat }){
       return response.data
     }
   }
-  async function getMessageInfo(message_id) {
-    if (message_id) {
-      let response = await api.get(`api/v1/message/${message_id}/`);
-      if (response.status === 200) {
-        return response.data
-      }
-    }
-    return null
-  }
+
 
 
   useEffect(() => {

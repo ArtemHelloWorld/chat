@@ -11,15 +11,15 @@ function ProfileEditPage({setActivePanel}) {
   const [newPhotoUploaded, setNewPhotoUploaded] = useState(false);
   const [formData, setFormData] = useState({});
 
-  async function fetchProfile() {
-    let response = await api.get(`api/v1/profile/${user.user_id}/`);
+  async function fetchUser() {
+    let response = await api.get(`api/v1/user/${user.user_id}/`);
     if (response.status === 200){
       return response.data;
     }
   }
 
   useEffect(() => {
-    fetchProfile().then(response => {
+    fetchUser().then(response => {
       setProfile(response);
       setFormData(response);
       console.log(response);
@@ -53,7 +53,7 @@ function ProfileEditPage({setActivePanel}) {
           }
       }
 
-      api.patch(`/api/v1/profile/${user.user_id}/`, formDataToSend
+      api.patch(`/api/v1/user/${user.user_id}/`, formDataToSend
       ).then(response => {
           setActivePanel('profile')
       })
