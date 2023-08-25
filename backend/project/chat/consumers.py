@@ -88,9 +88,10 @@ class ChatConsumer(WebsocketConsumer):
             print(f'Typing: {typing}')
 
             if typing:
-                self.chat_.status = f'{self.scope["user"].username} печатает...'
+                self.chat_.status[self.scope['user'].id] = 'Печатает...'
             else:
-                self.chat_.status = None
+                del self.chat_.status[self.scope['user'].id]
+
             self.chat_.save()
             chat_data = {
                 'id': self.chat_.id,

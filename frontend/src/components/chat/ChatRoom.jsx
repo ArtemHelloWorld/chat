@@ -51,7 +51,7 @@ function PageChats({ selectedChat }) {
 
     chatSocket.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
-
+      console.log(data)
       if(data.type === 'chat'){
         console.log('onmessage', event.data)
         setChatMessages(prev => [...prev, data]);
@@ -65,6 +65,7 @@ function PageChats({ selectedChat }) {
         }
       }
       else if (data.type === 'user_typing'){
+        console.log(data)
         if (data.sender === selectedChat.companion.id){
             // todo: setTimeout(() => {setIsCompanionTyping(false);}, 2000)
             setIsCompanionTyping(data.typing);
@@ -134,6 +135,7 @@ function PageChats({ selectedChat }) {
   }, [toScrollDown]);
 
   useEffect(() => {
+    console.log(isTyping)
     sendTypingStatus();
   }, [isTyping])
 

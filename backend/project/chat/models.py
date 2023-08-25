@@ -10,6 +10,9 @@ class Message(models.Model):
     is_read = models.BooleanField(default=False)
     sending_timestamp = core.models.TimestampField(auto_now=True, verbose_name='время отправки сообщения')
 
+    def __str__(self):
+        return f'Сообщение {self.pk}'
+
     class Meta:
         verbose_name = 'сообщение'
         verbose_name_plural = 'сообщения'
@@ -20,11 +23,11 @@ class Chat(models.Model):
     user1 = models.ForeignKey(users.models.User, on_delete=models.CASCADE, related_name='user1')
     user2 = models.ForeignKey(users.models.User, on_delete=models.CASCADE, related_name='user2')
     last_message = models.ForeignKey(Message, on_delete=models.SET_NULL, null=True, related_name='last_message', verbose_name='последнее сообщение')
-    status = models.TextField(null=True, default=None, verbose_name='статус, например, что пользователь печатает')
+    status = models.JSONField(default=dict, verbose_name='статус, например, что пользователь печатает')
     created_timestamp = core.models.TimestampField(auto_now=True, verbose_name='время создания чата')
 
     def __str__(self):
-        return f'Chat {self.pk}'
+        return f'Чат {self.pk}'
 
     class Meta:
         verbose_name = 'чат'

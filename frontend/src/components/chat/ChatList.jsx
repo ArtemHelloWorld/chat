@@ -46,7 +46,6 @@ export default function ChatList({ setSelectedChat }){
          setChats(prev => [...prev.map(chat => chat.id === data.id ? {...chat, last_message_info: data.last_message_info} : {...chat})])
        }
        else if ('status' in data){
-         // todo: проверить, что печатаешь не ты
          setChats(prev => [...prev.map(chat => chat.id === data.id ? {...chat, status: data.status} : {...chat})])
        }
     };
@@ -62,7 +61,21 @@ export default function ChatList({ setSelectedChat }){
         }, false);
   }, []);
 
-
+  const getChatDescription = (chat) => {
+    for (var active_user in chat.status){
+      if (chat.status.hasOwnProperty(active_user) && active_user.toString() !== user.user_id.toString()){
+        if (chat.status[active_user]){
+          return chat.status[active_user]
+        }
+      }
+    }
+    if(chat.last_message_info){
+      return chat.last_message_info.text
+    }
+    else {
+      return ''
+    }
+  }
   const handleChatClick = (chat) => {
     setSelectedChat(chat);
   };
@@ -76,7 +89,7 @@ export default function ChatList({ setSelectedChat }){
                 <div className="row align-items-start h-100">
                   <div className="col-md-4">
                     <div className="card-img-square">
-                      {chat.companion.profile_image ? (
+                      {chat.companion.profile_image && (
                         <img
                           src={
                             chat.companion.profile_image.indexOf('http') === -1
@@ -87,16 +100,15 @@ export default function ChatList({ setSelectedChat }){
                           className="img-fluid"
                           style={{ height: '5rem', width: 'auto' }}
                         />
-                      ) : (
-                        <></>
-                      )}
+                        )
+                      }
                     </div>
                   </div>
                   <div className="col-md-8 d-flex flex-column">
                     <div className="d-flex flex-column h-100">
                       <h4 className="user-username overflow-hidden text-truncate align-self-start">{chat.companion.username}</h4>
                       <p className="user-description overflow-hidden text-truncate align-self-start">
-                        {chat.status !== null ? chat.status : (chat.last_message_info ? chat.last_message_info.text: '')}
+                        {getChatDescription(chat)}
                       </p>
                     </div>
                   </div>
