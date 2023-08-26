@@ -130,10 +130,11 @@ function PageChats({ selectedChat }) {
     }
   }, [connected]);
 
-  // todo: called twice. figure out how to fix it
   useEffect(() => {
-    scrollDown('.messages', true);
-    setToScrollDown(false);
+    if (toScrollDown){
+      scrollDown('.messages', true);
+      setToScrollDown(false);
+    }
   }, [toScrollDown]);
 
   useEffect(() => {

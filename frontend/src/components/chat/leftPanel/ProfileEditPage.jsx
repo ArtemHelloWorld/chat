@@ -10,6 +10,7 @@ function ProfileEditPage({setActivePanel}) {
   const [profile, setProfile] = useState(null);
   const [newPhotoUploaded, setNewPhotoUploaded] = useState(false);
   const [formData, setFormData] = useState({});
+  const [formError, setFormError] = useState('');
 
   async function fetchUser() {
     let response = await api.get(`api/v1/user/${user.user_id}/`);
@@ -17,15 +18,6 @@ function ProfileEditPage({setActivePanel}) {
       return response.data;
     }
   }
-
-  useEffect(() => {
-    fetchUser().then(response => {
-      setProfile(response);
-      setFormData(response);
-      console.log(response);
-    })
-    ;
-  }, [])
 
   const handleChange = event => {
       const { name, value } = event.target;
@@ -36,35 +28,44 @@ function ProfileEditPage({setActivePanel}) {
   };
 
   const handlePhotoChange = event => {
-
-    console.log(event)
-      setFormData({
-          ...formData,
-          profile_image: event.target.files[0],
-      });
+    setFormData({
+        ...formData,
+        profile_image: event.target.files[0],
+    });
     setNewPhotoUploaded(true)
   };
   const handleSubmit = event => {
-      event.preventDefault();
-      const formDataToSend = new FormData();
-      for (const key in formData) {
-          if (formData[key] !== profile[key]){
-            formDataToSend.append(key, formData[key]);
-          }
-      }
+    event.preventDefault();
+    const formDataToSend = new FormData();
+    for (const key in formData) {
+        if (formData[key] !== profile[key]){
+          formDataToSend.append(key, formData[key]);
+        }
+    }
 
-      api.patch(`/api/v1/user/${user.user_id}/`, formDataToSend
-      ).then(response => {
-          setActivePanel('profile')
+    api.patch(`/api/v1/user/${user.user_id}/`, formDataToSend)
+      .then(response => {
+        setActivePanel('profile')
       })
       .catch(error => {
-          // todo: handle error
+        setFormError(error.toString());
       });
   };
+
+
+  useEffect(() => {
+    fetchUser().then(response => {
+      setProfile(response);
+      setFormData(response);
+    })
+    ;
+  }, [])
+
 
   if (formData) {
     return (
         <div className="form-group m-3">
+          {formError && <div>{formError}</div>}
             <form onSubmit={handleSubmit}>
                 <div>
                   {(formData.profile_image ||newPhotoUploaded ) &&
@@ -84,10 +85,9 @@ function ProfileEditPage({setActivePanel}) {
                 <div>
                   <label onChange={handlePhotoChange} htmlFor="image">
                     <input type="file" accept="image/*" placeholder="Фото" name="profile_photo" id="image" hidden/>
-                   <MdOutlineAddAPhoto size="3rem"/>
+                    <MdOutlineAddAPhoto size="3rem"/>
                   </label>
                 </div>
-                {/*<input type="email" placeholder="Биография" name="email" value={formData.email} onChange={handleChange} />*/}
                 <input className="form-control my-1" type="text" placeholder="Имя" name="first_name" value={formData.first_name || ''} onChange={handleChange} />
                 <input className="form-control my-1" type="text" placeholder="Фамилия" name="last_name" value={formData.last_name || ''} onChange={handleChange} />
                 <input className="form-control my-1" type="text" placeholder="Биография" name="bio" value={formData.bio || ''} onChange={handleChange} />
@@ -97,7 +97,10 @@ function ProfileEditPage({setActivePanel}) {
     );
   }
   else {
-    return (<>dfd</>)
+    return (
+        <>
+        </>
+    )
   }
 }
 
