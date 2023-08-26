@@ -5,7 +5,7 @@ import useAxios from '../../utils/useAxios';
 import ChatRoomMessage from './ChatRoomMessage.jsx';
 import TimestampToTimezone from "../../utils/timestampToTimezone.js";
 import addUnreadTitle from "../../utils/addTitle";
-
+import {VscSend} from 'react-icons/vsc'
 
 function PageChats({ selectedChat }) {
   const chatSocket = useRef();
@@ -164,8 +164,7 @@ function PageChats({ selectedChat }) {
           />
           <div className="mx-3">
             <h1 className="p-0 m-0">{companion.username}</h1>
-            {isCompanionTyping && <p><small>Печатает...</small></p>}
-            <div><small>{companion.is_online ? 'Онлайн' : `Был онлайн ${TimestampToTimezone(companion.last_online).toFormat('yyyy-MM-dd в HH:mm')}`}</small></div>
+            <div><small>{isCompanionTyping ? 'Печатает...' : (companion.is_online ? 'Онлайн' : `Был онлайн ${TimestampToTimezone(companion.last_online).toFormat('yyyy-MM-dd в HH:mm')}`)}</small></div>
           </div>
         </div>
 
@@ -189,7 +188,7 @@ function PageChats({ selectedChat }) {
             <input
               id="message-input"
               type="text"
-              className="form-control rounded-pill rounded-end"
+              className="form-control shadow-none border-dark black-light-bg rounded-pill rounded-end"
               placeholder="Cообщение..."
               value={messageInput}
               onChange={event => {setMessageInput(event.target.value); setIsTyping(true); console.log('typing...')}}
@@ -197,7 +196,7 @@ function PageChats({ selectedChat }) {
               onKeyDown={(event) => {event.key === 'Enter' && sendMessageInput()}}
               >
             </input>
-            <button onClick={sendMessageInput} className="btn btn-primary rounded-pill rounded-start">Отправить</button>
+            <button onClick={sendMessageInput} className="btn purple-bg rounded-pill rounded-start align-self-center"><VscSend size="1.75rem"/></button>
           </div>
         </div>
       </>

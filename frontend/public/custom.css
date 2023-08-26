@@ -19,7 +19,6 @@
     background-color: #7e6dd1 !important;
 }
 .purple-bg:hover {
-    color:white !important;
     background-color: #917eed !important;
 }
 
@@ -43,3 +42,7 @@
 }
 
 
+.black-light-bg::placeholder {
+    color: #b0b0b0 !important;
+    opacity: 1 !important;
+}

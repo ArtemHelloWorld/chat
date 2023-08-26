@@ -74,41 +74,43 @@ export default function ChatList({ selectedChat, setSelectedChat }){
 
   if(chats) {
     return (
-        <ul id="users" className="list-group my-3 ">
-          {chats.map((chat) => (
-            <li key={chat.id} onClick={() => handleChatClick(chat)} className='mb-1 overflow-hidden' style={{ listStyle: 'none' }}>
-              <a href={`#${chat.companion.username}`} className={`card ${selectedChat && chat.id === selectedChat.id ? 'purple-bg': 'black-light-bg'} text-decoration-none d-block border-2 h-100 p-0`}>
-                <div className="row align-items-start mw-100 h-100">
-                  <div className="col-md-4">
-                    <div className="card-img-square">
-                      {chat.companion.profile_image && (
-                        <img
-                          src={
-                            chat.companion.profile_image.indexOf('http') === -1
-                              ? 'http://127.0.0.1:8000' + chat.companion.profile_image
-                              : chat.companion.profile_image
-                          }
-                          alt=""
-                          className="img-fluid rounded-circle"
-                          style={{ height: '5rem', width: '5rem' }}
-                        />
-                        )
-                      }
+        <div className="overflow-auto">
+          <ul id="users" className="list-group overflow-auto my-3">
+            {chats.map((chat) => (
+              <li key={chat.id} onClick={() => handleChatClick(chat)} className='mb-1 overflow-hidden' style={{ listStyle: 'none' }}>
+                <a href={`#${chat.companion.username}`} className={`card ${selectedChat && chat.id === selectedChat.id ? 'purple-bg': 'black-light-bg'} text-decoration-none d-block border-2 h-100 p-0`}>
+                  <div className="row align-items-start mw-100 h-100">
+                    <div className="col-md-4">
+                      <div className="card-img-square">
+                        {chat.companion.profile_image && (
+                          <img
+                            src={
+                              chat.companion.profile_image.indexOf('http') === -1
+                                ? 'http://127.0.0.1:8000' + chat.companion.profile_image
+                                : chat.companion.profile_image
+                            }
+                            alt=""
+                            className="img-fluid rounded-circle"
+                            style={{ height: '5rem', width: '5rem' }}
+                          />
+                          )
+                        }
+                      </div>
+                    </div>
+                    <div className="col-md-8 d-flex flex-column">
+                      <div className="d-flex flex-column h-100">
+                        <h4 className="user-username text-truncate align-self-start">{chat.companion.username}</h4>
+                        <p className="user-description text-truncate align-self-start">
+                          {getChatDescription(chat)}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div className="col-md-8 d-flex flex-column">
-                    <div className="d-flex flex-column h-100">
-                      <h4 className="user-username text-truncate align-self-start">{chat.companion.username}</h4>
-                      <p className="user-description text-truncate align-self-start">
-                        {getChatDescription(chat)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </li>
-          ))}
-        </ul>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
     );
   }
   else{

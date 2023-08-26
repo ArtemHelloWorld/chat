@@ -26,7 +26,7 @@ const ChatPage = () => {
     return (
         <div className="container-fluid h-100">
             <div className="row h-100">
-                <div className="col-md-3 black-light-bg h-100 overflow-auto p-0">
+                <div className="col-md-3 black-light-bg h-100 d-flex flex-column p-0">
                     <LeftPanel selectedChat={selectedChat} setSelectedChat={setSelectedChat}/>
                 </div>
                 <div className="col-md-9 black-dark-bg h-100 d-flex flex-column p-0">
