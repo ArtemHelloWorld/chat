@@ -68,8 +68,7 @@ function PageChats({ selectedChat }) {
       else if (data.type === 'user_typing'){
         console.log(data)
         if (data.sender === selectedChat.companion.id){
-            // todo: setTimeout(() => {setIsCompanionTyping(false);}, 2000)
-            setIsCompanionTyping(data.typing);
+          setIsCompanionTyping(data.typing);
         }
       }
       else if (data.type === 'mark_message_as_read'){
@@ -138,8 +137,13 @@ function PageChats({ selectedChat }) {
   }, [toScrollDown]);
 
   useEffect(() => {
-    console.log(isTyping)
     sendTypingStatus();
+
+    if (isTyping) {
+      setTimeout(() => {
+        setIsTyping(false);
+      }, 3000)
+    }
   }, [isTyping])
 
 
@@ -168,7 +172,6 @@ function PageChats({ selectedChat }) {
           <ul className="message-list list-unstyled d-flex flex-column gap-2 my-3 px-5">
             {chatMessages.map((message, index) => (
                 <>
-
                   <ChatRoomMessage
                     key={message.id}
                     message={message}
