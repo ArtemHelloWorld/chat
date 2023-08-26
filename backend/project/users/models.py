@@ -12,9 +12,11 @@ class User(django.contrib.auth.models.AbstractUser):
 
     def save(self, *args, **kwargs):
         super(User, self).save(*args, **kwargs)
+        profile_image_path = self.profile_image.path
         # обрезаем фото под квадрат
-        rectangle_image = core.services.image_to_rectangle(image_path=self.profile_image.path)
-        rectangle_image.save(self.profile_image.path)
+        if profile_image_path:
+            rectangle_image = core.services.image_to_rectangle(image_path=self.profile_image.path)
+            rectangle_image.save(self.profile_image.path)
 
     def __str__(self):
         return f'Пользователь {self.pk}'
