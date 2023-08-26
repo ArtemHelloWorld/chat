@@ -4,6 +4,7 @@ import AuthContext from '../../context/AuthContext';
 import useAxios from '../../utils/useAxios';
 import ChatRoomMessage from './ChatRoomMessage.jsx';
 import TimestampToTimezone from "../../utils/timestampToTimezone.js";
+import addUnreadTitle from "../../utils/addTitle";
 
 
 function PageChats({ selectedChat }) {
@@ -124,7 +125,9 @@ function PageChats({ selectedChat }) {
 
   useEffect(() => {
     if(chatMessages.length){
+      addUnreadTitle('.messages', 'li.unread')
       scrollToElement('.messages', 'li.unread');
+
     }
   }, [connected]);
 
@@ -163,13 +166,16 @@ function PageChats({ selectedChat }) {
 
         <div className="messages flex-grow-1 overflow-auto mb-3 px-5">
           <ul className="message-list list-unstyled d-flex flex-column gap-2 my-3 px-5">
-            {chatMessages.map((message) => (
-              <ChatRoomMessage
-                key={message.id}
-                message={message}
-                onMessageRead={markMessageAsRead}
-                position={message.sender === user.user_id ? 'right': 'left'}
-              />
+            {chatMessages.map((message, index) => (
+                <>
+
+                  <ChatRoomMessage
+                    key={message.id}
+                    message={message}
+                    onMessageRead={markMessageAsRead}
+                    position={message.sender === user.user_id ? 'right': 'left'}
+                  />
+                </>
             ))}
           </ul>
         </div>
@@ -199,7 +205,6 @@ function PageChats({ selectedChat }) {
       </>
       )
   }
-    
 }
 
 export default PageChats;
