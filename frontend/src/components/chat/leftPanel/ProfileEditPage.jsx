@@ -64,7 +64,7 @@ function ProfileEditPage({setActivePanel}) {
 
   if (formData) {
     return (
-        <div>
+        <div className="form-group m-3">
             <form onSubmit={handleSubmit}>
                 <div>
                   {(formData.profile_image ||newPhotoUploaded ) &&
@@ -88,10 +88,10 @@ function ProfileEditPage({setActivePanel}) {
                   </label>
                 </div>
                 {/*<input type="email" placeholder="Биография" name="email" value={formData.email} onChange={handleChange} />*/}
-                <div><input type="text" placeholder="Имя" name="first_name" value={formData.first_name || ''} onChange={handleChange} /></div>
-                <div><input type="text" placeholder="Фамилия" name="last_name" value={formData.last_name || ''} onChange={handleChange} /></div>
-                <div><input type="text" placeholder="Биография" name="biography" value={formData.bio || ''} onChange={handleChange} /></div>
-                <div><button type="submit">Сохранить изменения</button></div>
+                <input className="form-control my-1" type="text" placeholder="Имя" name="first_name" value={formData.first_name || ''} onChange={handleChange} />
+                <input className="form-control my-1" type="text" placeholder="Фамилия" name="last_name" value={formData.last_name || ''} onChange={handleChange} />
+                <input className="form-control my-1" type="text" placeholder="Биография" name="bio" value={formData.bio || ''} onChange={handleChange} />
+                <button className="btn purple-bg mx-3 my-1" type="submit">Сохранить изменения</button>
             </form>
         </div>
     );

@@ -3,7 +3,7 @@ import useAxios from '../../utils/useAxios';
 import authContext from '../../context/AuthContext.js';
 import ReconnectingEventSource from "reconnecting-eventsource";
 
-export default function ChatList({ setSelectedChat }){
+export default function ChatList({ selectedChat, setSelectedChat }){
   const [chats, setChats] = useState([]);
   const {user, accessToken} = useContext(authContext);
   const api = useAxios();
@@ -74,11 +74,11 @@ export default function ChatList({ setSelectedChat }){
 
   if(chats) {
     return (
-        <ul id="users" className="list-group my-3">
+        <ul id="users" className="list-group my-3 ">
           {chats.map((chat) => (
-            <li key={chat.id} onClick={() => handleChatClick(chat)} className='mb-1' style={{ listStyle: 'none' }}>
-              <a href={`#${chat.companion.username}`} className="card text-decoration-none d-block h-100 p-0">
-                <div className="row align-items-start h-100">
+            <li key={chat.id} onClick={() => handleChatClick(chat)} className='mb-1 overflow-hidden' style={{ listStyle: 'none' }}>
+              <a href={`#${chat.companion.username}`} className={`card ${selectedChat && chat.id === selectedChat.id ? 'purple-bg': 'black-light-bg'} text-decoration-none d-block border-2 h-100 p-0`}>
+                <div className="row align-items-start mw-100 h-100">
                   <div className="col-md-4">
                     <div className="card-img-square">
                       {chat.companion.profile_image && (
@@ -89,8 +89,8 @@ export default function ChatList({ setSelectedChat }){
                               : chat.companion.profile_image
                           }
                           alt=""
-                          className="img-fluid"
-                          style={{ height: '5rem', width: 'auto' }}
+                          className="img-fluid rounded-circle"
+                          style={{ height: '5rem', width: '5rem' }}
                         />
                         )
                       }
@@ -98,8 +98,8 @@ export default function ChatList({ setSelectedChat }){
                   </div>
                   <div className="col-md-8 d-flex flex-column">
                     <div className="d-flex flex-column h-100">
-                      <h4 className="user-username overflow-hidden text-truncate align-self-start">{chat.companion.username}</h4>
-                      <p className="user-description overflow-hidden text-truncate align-self-start">
+                      <h4 className="user-username text-truncate align-self-start">{chat.companion.username}</h4>
+                      <p className="user-description text-truncate align-self-start">
                         {getChatDescription(chat)}
                       </p>
                     </div>

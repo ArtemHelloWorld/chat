@@ -15,6 +15,15 @@ function ProfilePage() {
     }
   }
 
+  function wrapIntoBox(title, value)  {
+     return(
+         <div className="d-flex justify-content-start mx-3">
+           <div className="px-3 border">{title}</div>
+           <div className="px-3 flex-grow-1 border">{value}</div>
+         </div>
+     )
+  }
+
   useEffect(() => {
     fetchUser().then(response => {
 
@@ -40,11 +49,12 @@ function ProfilePage() {
                 />
               </div>
           }
-          <div>Username: {profile.username}</div>
+
+          {wrapIntoBox("Username", profile.username)}
           {/*{profile.email ? <p>Email: {profile.email}</p> : <></>}*/}
-          {profile.first_name && <div>First Name: {profile.first_name}</div> }
-          {profile.last_name && <div>Last Name: {profile.last_name}</div> }
-          {profile.bio && <div>Bio: {profile.bio }</div>}
+          {profile.first_name && wrapIntoBox("First name", profile.first_name)}
+          {profile.last_name && wrapIntoBox("Last name", profile.last_name)}
+          {profile.bio && wrapIntoBox("Bio", profile.bio)}
         </div>
     );
   }

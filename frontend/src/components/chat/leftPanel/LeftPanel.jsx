@@ -7,7 +7,7 @@ import {IoMdArrowBack} from 'react-icons/io'
 import {MdModeEdit, MdMenu} from 'react-icons/md'
 import AuthContext from "../../../context/AuthContext";
 
-const LeftPanel = ({setSelectedChat}) => {
+const LeftPanel = ({selectedChat, setSelectedChat}) => {
   const [activePanel, setActivePanel] = useState('chat-list');
   const {logoutUser} = useContext(AuthContext)
 
@@ -17,12 +17,12 @@ const LeftPanel = ({setSelectedChat}) => {
         {activePanel === 'chat-list' &&
             <>
               <div className="d-flex justify-content-start px-3 pt-2">
-                <DropdownButton id="dropdown-button e-caret-hide" variant='dark' title={<MdMenu size="2rem" />}>
+                <DropdownButton id="dropdown-button e-caret-hide" variant='dark' className="black-light-bg" title={<MdMenu size="2rem" />}>
                   <Dropdown.Item onClick={() => setActivePanel('profile')}>Profile</Dropdown.Item>
                   <Dropdown.Item onClick={() => logoutUser()}>Logout</Dropdown.Item>
                 </DropdownButton>
               </div>
-              <ChatList setSelectedChat={setSelectedChat}/>
+              <ChatList selectedChat={selectedChat} setSelectedChat={setSelectedChat}/>
             </>
         }
         {activePanel === 'profile' &&

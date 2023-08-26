@@ -1,6 +1,9 @@
 import React, {useEffect, useRef} from 'react';
 import { useInView } from 'react-intersection-observer';
 import timestampToTimezone from "../../utils/timestampToTimezone.js";
+import {BiCheckDouble} from "react-icons/bi";
+
+
 function ChatRoomMessage({ message, onMessageRead, position }) {
   const listItemRef = useRef();
   const [inViewRef, inView] = useInView();
@@ -23,12 +26,13 @@ function ChatRoomMessage({ message, onMessageRead, position }) {
           className={`message-right px-3 align-self-end w-65 ${message.is_read ? 'read' : ''} ${inView ? 'visible' : ''}`}
         >
           <div ref={inViewRef} className="d-flex justify-content-end">
-            <div className="rounded-3 p-2 bg-light text-black text-start" style={{wordBreak: 'break-word'}}>
+            <div className="rounded-3 p-2 purple-message text-start" style={{wordBreak: 'break-word'}}>
               {message.text}
-              <div className="align-self-end">
-                <small className="message-time d-flex justify-content-end text-muted">
-                  {sendingTimezone.toFormat('HH:mm')} {message.is_read ? 'read' : ''}
+              <div className="d-flex justify-content-end align-items-center">
+                <small className="message-time text-muted">
+                  {sendingTimezone.toFormat('HH:mm')}
                 </small>
+                {message.is_read ? <BiCheckDouble/> : ''}
               </div>
             </div>
           </div>
@@ -40,7 +44,7 @@ function ChatRoomMessage({ message, onMessageRead, position }) {
            className={`message-left px-3 align-self-start w-65 ${message.is_read ? 'read' : 'unread'} ${inView ? 'visible' : ''}`}
         >
           <div ref={inViewRef} className='d-flex justify-content-start'>
-            <div className="rounded-3 p-2 bg-secondary text-light text-start" style={{wordBreak: 'break-word'}}>{message.text}
+            <div className="rounded-3 p-2 black-message text-start" style={{wordBreak: 'break-word'}}>{message.text}
               <div className="align-self-end">
                 <small className="message-time d-flex justify-content-end">
                   {sendingTimezone.toFormat('HH:mm')}
@@ -55,25 +59,3 @@ function ChatRoomMessage({ message, onMessageRead, position }) {
 }
 
 export default ChatRoomMessage;
-
-
-
-
-
-//
-//
-// {message.sender === user.user_id ? (
-//
-//               ) : (
-//                 <li className={`message-left px-3 align-self-start w-65`} id={message.id}>
-//                   <div className={`d-flex justify-content-start ${true ? 'read' : ''}`}>
-//                     <div className="rounded-3 p-2 bg-secondary text-light text-start" style={{wordBreak: 'break-word'}}>{message.text}
-//                       <div className="align-self-end">
-//                         <small className="message-time d-flex justify-content-end">
-//                           {message.time_sending}
-//                         </small>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </li>
-//               )}

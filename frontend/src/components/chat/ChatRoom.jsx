@@ -143,7 +143,7 @@ function PageChats({ selectedChat }) {
   if (selectedChat && connected){
     return(
       <>
-        <div className="room-header d-flex flex-row align-items-center py-3 px-5">
+        <div className="room-header black-light-bg mx-1 d-flex flex-row align-items-center px-5">
           <img
             src={
               companion.profile_image.indexOf('http') === -1
@@ -151,13 +151,13 @@ function PageChats({ selectedChat }) {
                 : companion.profile_image
             }
             alt=""
-            className="img-fluid"
-            style={{ height: '3rem', width: 'auto' }}
+            className="img-fluid rounded-circle"
+            style={{ height: '4rem', width: '4rem' }}
           />
           <div className="mx-3">
             <h1 className="p-0 m-0">{companion.username}</h1>
             {isCompanionTyping && <p><small>Печатает...</small></p>}
-            <p><small>{companion.is_online ? 'Онлайн' : `Был онлайн ${TimestampToTimezone(companion.last_online).toFormat('yyyy-MM-dd в HH:mm')}`}</small></p>
+            <div><small>{companion.is_online ? 'Онлайн' : `Был онлайн ${TimestampToTimezone(companion.last_online).toFormat('yyyy-MM-dd в HH:mm')}`}</small></div>
           </div>
         </div>
 

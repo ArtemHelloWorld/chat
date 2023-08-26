@@ -1,10 +1,45 @@
+.w-65 {
+  width: 65% !important;
+}
+
 .gradient-custom {
     /* fallback for old browsers */
     background: #6a11cb;
-    
+
     /* Chrome 10-25, Safari 5.1-6 */
     background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
-    
+
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
 }
+
+
+.purple-bg {
+    color:white !important;
+    background-color: #7e6dd1 !important;
+}
+.purple-bg:hover {
+    color:white !important;
+    background-color: #917eed !important;
+}
+
+.black-light-bg{
+    color:white !important;
+    background-color: #212121 !important;
+}
+.black-dark-bg{
+    background-color: #121212 !important;
+}
+.black-message {
+    color:white !important;
+    background-color: #212121 !important;
+}
+.purple-message {
+    color:white !important;
+    background-color: #7e6dd1 !important;
+}
+.purple-message .text-muted {
+    color: #b0b0b0 !important;
+}
+
+
