@@ -75,12 +75,14 @@ class ChatConsumer(WebsocketConsumer):
             }
             self.chat_.last_message = message_bd
             self.chat_.save()
+
             chat_data = {
                 'id': self.chat_.id,
                 'last_message_info': chat.serializers.MessageSerializer(message_bd).data,
             }
             send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
             send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
+
             async_to_sync(self.channel_layer.group_send)(self.chat_group_name, data)
 
         elif 'typing' in data_json:
@@ -97,6 +99,7 @@ class ChatConsumer(WebsocketConsumer):
                 'id': self.chat_.id,
                 'status': self.chat_.status,
             }
+            # todo: а нужно ли отправлять всем
             send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
             send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
 
@@ -115,7 +118,13 @@ class ChatConsumer(WebsocketConsumer):
             message = chat.models.Message.objects.get(pk=message_pk)
             message.is_read = True
             message.save()
-            print('marked')
+            if self.chat_.last_message == message:
+                chat_data = {
+                    'id': self.chat_.id,
+                    'last_message_info': chat.serializers.MessageSerializer(message).data,
+                }
+                send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
+                send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
 
             async_to_sync(self.channel_layer.group_send)(
                 self.chat_group_name,
