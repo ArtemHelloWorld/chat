@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import { useInView } from 'react-intersection-observer';
 import timestampToTimezone from "../../utils/timestampToTimezone.js";
-import {BiCheckDouble} from "react-icons/bi";
+import {BiCheckDouble, BiCheck} from "react-icons/bi";
 
 
 function ChatRoomMessage({ message, onMessageRead, position }) {
@@ -29,10 +29,10 @@ function ChatRoomMessage({ message, onMessageRead, position }) {
             <div className="rounded-3 p-2 purple-message text-start" style={{wordBreak: 'break-word'}}>
               {message.text}
               <div className="d-flex justify-content-end align-items-center">
-                <small className="message-time text-muted">
+                <small className="message-time custom-text-muted">
                   {sendingTimezone.toFormat('HH:mm')}
                 </small>
-                {message.is_read ? <BiCheckDouble/> : ''}
+                {message.is_read ? <BiCheckDouble/> : <BiCheck/>}
               </div>
             </div>
           </div>

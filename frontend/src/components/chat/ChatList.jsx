@@ -2,6 +2,8 @@ import React, {useState, useEffect, useContext} from 'react'
 import useAxios from '../../utils/useAxios';
 import authContext from '../../context/AuthContext.js';
 import ReconnectingEventSource from "reconnecting-eventsource";
+import timestampToTimezone from "../../utils/timestampToTimezone";
+import {BiCheckDouble, BiCheck} from "react-icons/bi";
 
 export default function ChatList({ selectedChat, setSelectedChat }){
   const [chats, setChats] = useState([]);
@@ -15,8 +17,6 @@ export default function ChatList({ selectedChat, setSelectedChat }){
       return response.data
     }
   }
-
-
 
   useEffect(() => {
     console.log('ФЕТЧИМ ЧАТЫ')
@@ -64,10 +64,22 @@ export default function ChatList({ selectedChat, setSelectedChat }){
     if(chat.last_message_info){
       return chat.last_message_info.text
     }
-    else {
-      return ''
+
+  }
+  const getLastMessageDate = (chat) => {
+    if(chat.last_message_info){
+      return timestampToTimezone(chat.last_message_info.sending_timestamp).toFormat('HH:mm')
     }
   }
+
+  const getLastMessageStatus = (chat) => {
+    if(chat.last_message_info) {
+      if (chat.last_message_info.sender === user.user_id) {
+        return chat.last_message_info.is_read ? <BiCheckDouble className="purple"/> : <BiCheck className="purple"/>
+      }
+    }
+  }
+
   const handleChatClick = (chat) => {
     setSelectedChat(chat);
   };
@@ -99,10 +111,18 @@ export default function ChatList({ selectedChat, setSelectedChat }){
                     </div>
                     <div className="col-md-8 d-flex flex-column">
                       <div className="d-flex flex-column h-100">
-                        <h4 className="user-username text-truncate align-self-start">{chat.companion.username}</h4>
-                        <p className="user-description text-truncate align-self-start">
-                          {getChatDescription(chat)}
-                        </p>
+                        <div className="d-flex justify-content-between">
+                          <div className="d-flex justify-content-start user-description text-truncate align-self-start mw-100">
+                            <h4 className="user-username text-truncate align-self-start">{chat.companion.username}</h4>
+                          </div>
+                          <div className="last-activity custom-text-muted p-0">{getLastMessageStatus(chat)} {getLastMessageDate(chat)}</div>
+                        </div>
+                        <div className="d-flex justify-content-between">
+                          <p className="chat-description custom-text-muted text-truncate overflow-hidden align-self-start">
+                            {getChatDescription(chat)}
+                          </p>
+                          <div className="unread-messages-count p-0"></div>
+                        </div>
                       </div>
                     </div>
                   </div>
