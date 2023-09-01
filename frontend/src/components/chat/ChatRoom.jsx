@@ -13,6 +13,7 @@ function PageChats({ selectedChat }) {
   const [toScrollDown, setToScrollDown] = useState(false);
 
   const [isTyping, setIsTyping] = useState(false);
+  const [timerId, setTimerId] = useState(null)
   const [companion, setCompanion] = useState({})
   const [isCompanionTyping, setIsCompanionTyping] = useState(false);
 
@@ -139,13 +140,18 @@ function PageChats({ selectedChat }) {
 
   useEffect(() => {
     sendTypingStatus();
-
-    if (isTyping) {
-      setTimeout(() => {
-        setIsTyping(false);
-      }, 3000)
-    }
   }, [isTyping])
+
+  function updateTimeout(){
+    if (timerId) {
+      clearTimeout(timerId);
+    }
+    let timer = setTimeout(() => {
+      setIsTyping(false);
+    }, 2000)
+    setTimerId(timer);
+
+  }
 
 
   if (selectedChat && connected){
@@ -191,7 +197,7 @@ function PageChats({ selectedChat }) {
               className="form-control shadow-none border-dark black-light-bg rounded-pill rounded-end"
               placeholder="Cообщение..."
               value={messageInput}
-              onChange={event => {setMessageInput(event.target.value); setIsTyping(true); console.log('typing...')}}
+              onChange={event => {setMessageInput(event.target.value); setIsTyping(true); updateTimeout(); console.log('typing...')}}
               onBlur={event => {setIsTyping(false); console.log('not typing')}}
               onKeyDown={(event) => {event.key === 'Enter' && sendMessageInput()}}
               >
