@@ -59,17 +59,21 @@ class ChatConsumer(WebsocketConsumer):
 
         if 'message' in data_json:
             message = data_json.get('message')
+            file = data_json.get('file')
+            print(file)
             print(f'message: {message}')
 
             message_bd = chat.models.Message.objects.create(
                 chat=self.chat_,
                 sender=self.scope['user'],
-                text=message
+                text=message,
+                file=file,
             )
             data = {
                 'type': 'chat_message',
                 'pk': message_bd.pk,
                 'text': message_bd.text,
+                'file': message_bd.file,
                 'sender': message_bd.sender.id,
                 'sending_timestamp': message_bd.sending_timestamp
             }
@@ -149,6 +153,7 @@ class ChatConsumer(WebsocketConsumer):
             'type': 'chat',
             'id': event.get('pk'),
             'text': event.get('text'),
+            'file': event.get('file'),
             'sender': event.get('sender'),
             'sending_timestamp': event.get('sending_timestamp'),
         }

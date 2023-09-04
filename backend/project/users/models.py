@@ -5,6 +5,7 @@ import core.services
 
 default_image_path = 'profile_images/default.png'
 
+
 class User(django.contrib.auth.models.AbstractUser):
     bio = django.db.models.TextField(verbose_name='о себе', null=True, blank=True)
     profile_image = django.db.models.ImageField(upload_to='profile_images/%Y/%m/%d', verbose_name='фотография', null=True, blank=True, default=default_image_path)

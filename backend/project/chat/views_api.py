@@ -54,3 +54,7 @@ class ChatMessagesInfoView(rest_framework.generics.ListCreateAPIView):
     def get_queryset(self):
         chat_obj = django.shortcuts.get_object_or_404(chat.models.Chat, id=self.kwargs['chat_id'])
         return chat.models.Message.objects.filter(chat=chat_obj)
+
+
+class MessageFileCreate(rest_framework.generics.CreateAPIView):
+    serializer_class = chat.serializers.MessageFileSerializer

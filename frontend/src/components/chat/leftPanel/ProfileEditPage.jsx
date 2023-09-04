@@ -28,6 +28,8 @@ function ProfileEditPage({setActivePanel}) {
   };
 
   const handlePhotoChange = event => {
+    console.log(event.target.files[0])
+
     setFormData({
         ...formData,
         profile_image: event.target.files[0],

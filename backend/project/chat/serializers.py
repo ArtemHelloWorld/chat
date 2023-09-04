@@ -34,3 +34,7 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
         return None
 
 
+class MessageFileSerializer(rest_framework.serializers.ModelSerializer):
+    class Meta:
+        model = chat.models.MessageFile
+        fields = '__all__'

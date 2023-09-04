@@ -6,6 +6,7 @@ import ChatRoomMessage from './ChatRoomMessage.jsx';
 import TimestampToTimezone from "../../utils/timestampToTimezone.js";
 import addUnreadTitle from "../../utils/addTitle";
 import {VscSend} from 'react-icons/vsc'
+import {MdOutlineAddAPhoto} from 'react-icons/md';
 
 function PageChats({ selectedChat }) {
   const chatSocket = useRef();
@@ -18,6 +19,7 @@ function PageChats({ selectedChat }) {
   const [isCompanionTyping, setIsCompanionTyping] = useState(false);
 
   const [messageInput, setMessageInput] = useState('');
+  const [fileInput, setFileInput] = useState(null);
   const [chatMessages, setChatMessages] = useState([]);
 
   const {user, accessToken} = useContext(AuthContext);
@@ -93,22 +95,46 @@ function PageChats({ selectedChat }) {
     }
   }
 
-  const sendMessageInput = async () => {
-    if(connected && messageInput !== ''){
+  const sendInputData = async () => {
+    if(connected && (messageInput || fileInput)){
       chatSocket.current.send(JSON.stringify({
         'message': messageInput,
+        'file': fileInput,
       }))
       setIsTyping(false);
       setMessageInput('');
+      setFileInput(null);
     }
   }
   const markMessageAsRead = async (message) => {
     if(connected){
       chatSocket.current.send(JSON.stringify({
-            'mark_message_as_read': message.id,
-        }))
+        'mark_message_as_read': message.id,
+      }))
     }
   }
+  // todo: сохранять только при отправке сообщения
+  const uploadMessageFile = async (event) => {
+    console.log(event.target.files[0])
+    let response = await api.post(`api/v1/message/file/upload/`, {
+      'image': event.target.files[0]
+    },
+        {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+}
+    );
+    if (response.status === 201){
+      return response.data;
+    }
+  }
+
+  const handlePhotoChange = event => {
+    console.log(event.target.files[0])
+    uploadMessageFile(event).then(data => {setFileInput(data['id'])})
+
+  };
 
 
   useEffect(() => {
@@ -191,6 +217,15 @@ function PageChats({ selectedChat }) {
 
         <div className="container">
           <div id="message-form" className="input-group input-group-lg mx-auto mb-3 justify-content-end w-50" >
+            <div>
+              <label
+                  onChange={handlePhotoChange}
+                  htmlFor="image"
+              >
+                <input type="file" accept="image/*" placeholder="Фото" name="profile_photo" id="image" hidden/>
+                <MdOutlineAddAPhoto size="3rem"/>
+              </label>
+            </div>
             <input
               id="message-input"
               type="text"
@@ -199,10 +234,10 @@ function PageChats({ selectedChat }) {
               value={messageInput}
               onChange={event => {setMessageInput(event.target.value); setIsTyping(true); updateTimeout(); console.log('typing...')}}
               onBlur={event => {setIsTyping(false); console.log('not typing')}}
-              onKeyDown={(event) => {event.key === 'Enter' && sendMessageInput()}}
+              onKeyDown={(event) => {event.key === 'Enter' && sendInputData()}}
               >
             </input>
-            <button onClick={sendMessageInput} className="btn purple-bg rounded-pill rounded-start align-self-center"><VscSend size="1.75rem"/></button>
+            <button onClick={sendInputData} className="btn purple-bg rounded-pill rounded-start align-self-center"><VscSend size="1.75rem"/></button>
           </div>
         </div>
       </>
