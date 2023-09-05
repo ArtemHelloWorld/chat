@@ -15,17 +15,23 @@ class ReceiversMixin:
     """
     def message_receiver(self, data_json):
         message = data_json.get('message')
+        file_id = data_json.get('file_id')
         print(f'message: {message}')
 
         message_bd = chat.models.Message.objects.create(
             chat=self.chat_,
             sender=self.scope['user'],
-            text=message
+            text=message,
         )
+        if file_id:
+            message_bd.file = chat.models.MessageFile.objects.get(id=file_id)
+            message_bd.save()
+
         data = {
             'type': 'chat_message',
             'pk': message_bd.pk,
             'text': message_bd.text,
+            'file': message_bd.file.image.url,
             'sender': message_bd.sender.id,
             'sending_timestamp': message_bd.sending_timestamp
         }
@@ -115,6 +121,7 @@ class HandlersMixin:
             'type': 'chat',
             'id': event.get('pk'),
             'text': event.get('text'),
+            'file': event.get('file'),
             'sender': event.get('sender'),
             'sending_timestamp': event.get('sending_timestamp'),
         }

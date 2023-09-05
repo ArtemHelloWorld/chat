@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useContext }  from 'react'
-import { scrollToElement, scrollDown } from '../../utils/ScrollDown';
-import AuthContext from '../../context/AuthContext';
-import useAxios from '../../utils/useAxios';
+import { scrollToElement, scrollDown } from '../../../utils/ScrollDown';
+import AuthContext from '../../../context/AuthContext';
+import useAxios from '../../../utils/useAxios';
 import ChatRoomMessage from './ChatRoomMessage.jsx';
-import TimestampToTimezone from "../../utils/timestampToTimezone.js";
-import addUnreadTitle from "../../utils/addTitle";
+import addUnreadTitle from '../../../utils/addTitle';
 import {VscSend} from 'react-icons/vsc'
+import {MdOutlineAddAPhoto} from 'react-icons/md';
 
 function PageChats({ selectedChat }) {
   const chatSocket = useRef();
@@ -19,7 +19,7 @@ function PageChats({ selectedChat }) {
 
   const [messageInput, setMessageInput] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
-
+  const [fileInput, setFileInput] = useState(null);
   const {user, accessToken} = useContext(AuthContext);
   const api = useAxios();
 
@@ -48,7 +48,7 @@ function PageChats({ selectedChat }) {
 
     chatSocket.current.onopen = () => {
       setConnected(true);
-      console.log('Socket connected');
+      console.log('Socket connected', connected);
     }
 
     chatSocket.current.onmessage = (event) => {
@@ -59,15 +59,13 @@ function PageChats({ selectedChat }) {
         setChatMessages(prev => [...prev, data]);
         setToScrollDown(true);
       }
-      else if (data.type === 'online_status') {
-        console.log(data, selectedChat.companion.id)
+      else if (data.type === 'i_am_here') {
         if (data.sender === selectedChat.companion.id) {
-          selectedChat.companion = {...selectedChat.companion, is_online: data.is_online, last_online: data.last_online}
+          selectedChat.companion = {...selectedChat.companion, is_online: data.is_online}
           setCompanion(selectedChat.companion)
         }
       }
       else if (data.type === 'user_typing'){
-        console.log(data)
         if (data.sender === selectedChat.companion.id){
           setIsCompanionTyping(data.typing);
         }
@@ -93,19 +91,22 @@ function PageChats({ selectedChat }) {
     }
   }
 
-  const sendMessageInput = async () => {
-    if(connected && messageInput !== ''){
+   const sendInputData = async () => {
+    if(connected && (messageInput || fileInput)){
+      console.log(fileInput, 'ffff');
       chatSocket.current.send(JSON.stringify({
         'message': messageInput,
+        'file_id': fileInput,
       }))
       setIsTyping(false);
       setMessageInput('');
+      setFileInput(null);
     }
   }
   const markMessageAsRead = async (message) => {
     if(connected){
       chatSocket.current.send(JSON.stringify({
-          'mark_message_as_read': message.id,
+        'mark_message_as_read': message.id,
       }))
     }
   }
@@ -152,7 +153,29 @@ function PageChats({ selectedChat }) {
     setTimerId(timer);
 
   }
+  // todo: сохранять только при отправке сообщения
+  const uploadMessageFile = async (event) => {
+    console.log(event.target.files[0])
+    let response = await api.post(`api/v1/message/file/upload/`, {
+      'image': event.target.files[0]
+    },
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+    );
+    if (response.status === 201){
+      return response.data;
+    }
+  }
 
+
+  const handlePhotoChange = event => {
+    console.log(event.target.files[0])
+    uploadMessageFile(event).then(data => {setFileInput(data['id'])})
+
+  };
 
   if (selectedChat && connected){
     return(
@@ -170,7 +193,7 @@ function PageChats({ selectedChat }) {
           />
           <div className="mx-3">
             <h1 className="p-0 m-0">{companion.username}</h1>
-            <div><small>{isCompanionTyping ? 'Печатает...' : (companion.is_online ? 'Онлайн' : `Был онлайн ${TimestampToTimezone(companion.last_online).toFormat('yyyy-MM-dd в HH:mm')}`)}</small></div>
+            <div><small>{isCompanionTyping ? 'Печатает...' : (companion.is_online ? 'Онлайн' : `Был(a) недавно`)}</small></div>
           </div>
         </div>
 
@@ -191,6 +214,15 @@ function PageChats({ selectedChat }) {
 
         <div className="container">
           <div id="message-form" className="input-group input-group-lg mx-auto mb-3 justify-content-end w-50" >
+             <div>
+              <label
+                  onChange={handlePhotoChange}
+                  htmlFor="image"
+              >
+                <input type="file" accept="image/*" placeholder="Фото" name="profile_photo" id="image" hidden/>
+                <MdOutlineAddAPhoto size="3rem"/>
+              </label>
+            </div>
             <input
               id="message-input"
               type="text"
@@ -199,10 +231,10 @@ function PageChats({ selectedChat }) {
               value={messageInput}
               onChange={event => {setMessageInput(event.target.value); setIsTyping(true); updateTimeout(); console.log('typing...')}}
               onBlur={event => {setIsTyping(false); console.log('not typing')}}
-              onKeyDown={(event) => {event.key === 'Enter' && sendMessageInput()}}
+              onKeyDown={(event) => {event.key === 'Enter' && sendInputData()}}
               >
             </input>
-            <button onClick={sendMessageInput} className="btn purple-bg rounded-pill rounded-start align-self-center"><VscSend size="1.75rem"/></button>
+            <button onClick={sendInputData} className="btn purple-bg rounded-pill rounded-start align-self-center"><VscSend size="1.75rem"/></button>
           </div>
         </div>
       </>
