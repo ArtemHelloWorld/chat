@@ -7,9 +7,15 @@ import chat.models
 
 
 class MessageSerializer(rest_framework.serializers.ModelSerializer):
+    file = rest_framework.serializers.SerializerMethodField(allow_null=True)
+
     class Meta:
         model = chat.models.Message
-        fields = ['id', 'sender', 'text', 'is_read', 'sending_timestamp']
+        fields = ['id', 'sender', 'text', 'is_read', 'sending_timestamp', 'file']
+
+    def get_file(self, obj):
+        if obj.file:
+            return obj.file.image.url
 
 
 class ChatSerializer(rest_framework.serializers.ModelSerializer):
@@ -34,3 +40,7 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
         return None
 
 
+class MessageFileSerializer(rest_framework.serializers.ModelSerializer):
+    class Meta:
+        model = chat.models.MessageFile
+        fields = '__all__'

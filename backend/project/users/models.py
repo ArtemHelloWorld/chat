@@ -4,6 +4,7 @@ import django.db.models
 import core.services
 
 
+
 class User(django.contrib.auth.models.AbstractUser):
     default_image_path = 'profile_images/default.png'
 

@@ -7,6 +7,7 @@ class Message(models.Model):
     chat = models.ForeignKey('Chat', on_delete=models.CASCADE, related_name='chat')
     sender = models.ForeignKey(users.models.User, on_delete=models.CASCADE, related_name='sent_messages')
     text = models.TextField(verbose_name='текст сообщения')
+    file = models.ForeignKey('MessageFile', null=True, on_delete=models.SET_NULL)
     is_read = models.BooleanField(default=False)
     sending_timestamp = core.models.TimestampField(auto_now=True, verbose_name='время отправки сообщения')
 
@@ -17,6 +18,10 @@ class Message(models.Model):
         verbose_name = 'сообщение'
         verbose_name_plural = 'сообщения'
         ordering = ['sending_timestamp']
+
+
+class MessageFile(models.Model):
+    image = models.ImageField(upload_to='chat_images/%Y/%m/%d', null=True, verbose_name='фотография')
 
 
 class Chat(models.Model):
