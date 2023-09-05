@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useContext} from 'react'
-import useAxios from '../../utils/useAxios';
-import authContext from '../../context/AuthContext.js';
+import useAxios from '../../../utils/useAxios';
+import authContext from '../../../context/AuthContext.js';
 import ReconnectingEventSource from "reconnecting-eventsource";
-import timestampToTimezone from "../../utils/timestampToTimezone";
+import timestampToTimezone from "../../../utils/timestampToTimezone";
 import {BiCheckDouble, BiCheck} from "react-icons/bi";
 
 export default function ChatList({ selectedChat, setSelectedChat }){
@@ -53,8 +53,9 @@ export default function ChatList({ selectedChat, setSelectedChat }){
         }, false);
   }, []);
 
+
   const getChatDescription = (chat) => {
-    for (var active_user in chat.status){
+    for (let active_user in chat.status){
       if (chat.status.hasOwnProperty(active_user) && active_user.toString() !== user.user_id.toString()){
         if (chat.status[active_user]){
           return chat.status[active_user]

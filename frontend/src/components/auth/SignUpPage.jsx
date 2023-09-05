@@ -1,10 +1,8 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate } from "react-router-dom";
+import React, {useContext, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 
 import AuthContext from '../../context/AuthContext.js';
 import AuthLayout from './AuthLayout.jsx';
-
-
 
 
 
@@ -12,6 +10,7 @@ function SignUpPage() {
   let navigate = useNavigate();
   const {signUpUser} = useContext(AuthContext);
 
+  const [signUpSuccess, setSignUpSuccess] = useState(false);
 
   const [formError, setformError] = useState('');
   const [usernameError, setUsernameError] = useState('');
@@ -23,7 +22,7 @@ function SignUpPage() {
 
     signUpUser(event).then(response => {
       if (response === 200){
-        navigate('/login/');
+        setSignUpSuccess(true)
       }
       else{
         setformError(response['detail'])
@@ -33,10 +32,8 @@ function SignUpPage() {
     });
   }
 
-
-  
-
-  return (
+  if (!signUpSuccess){
+    return (
     <AuthLayout>
       <div className="mt-md-4">
         <h1 className="fw-bold mb-2">Регистрация</h1>
@@ -79,8 +76,18 @@ function SignUpPage() {
         </div>
       </div>
     </AuthLayout>
-
-  );
+    );
+  }
+  else{
+    return (
+      <AuthLayout>
+        <div className="mt-md-4">
+          <h1 className="fw-bold mb-2">Вы зарегистрировались</h1>
+          <button type="submit" className="btn btn-primary btn-lg px-5 mb-5"><a href="/login">Войти</a></button>
+        </div>
+      </AuthLayout>
+    )
+  }
 }
 
 export default SignUpPage;
