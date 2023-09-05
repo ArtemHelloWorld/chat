@@ -20,8 +20,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'bio', 'profile_image', 'is_online', 'last_online']
-        # todo: fields += ['email']
+        fields = ['id', 'username', 'first_name', 'last_name', 'bio', 'profile_image']
+        # fields += ['email', 'is_online', 'last_online']
 
 
 

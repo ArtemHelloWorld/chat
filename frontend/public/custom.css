@@ -50,6 +50,7 @@
     background-color: var(--black-light) !important;
 }
 .black-dark-bg{
+    color:white !important;
     background-color: var(--black-dark) !important;
 }
 .black-message {
@@ -64,6 +65,10 @@
 
 
 .black-light-bg::placeholder {
+    color:  var(--grey) !important;
+    opacity: 1 !important;
+}
+.black-dark-bg::placeholder {
     color:  var(--grey) !important;
     opacity: 1 !important;
 }

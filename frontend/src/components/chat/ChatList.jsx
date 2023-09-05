@@ -53,8 +53,9 @@ export default function ChatList({ selectedChat, setSelectedChat }){
         }, false);
   }, []);
 
+
   const getChatDescription = (chat) => {
-    for (var active_user in chat.status){
+    for (let active_user in chat.status){
       if (chat.status.hasOwnProperty(active_user) && active_user.toString() !== user.user_id.toString()){
         if (chat.status[active_user]){
           return chat.status[active_user]
