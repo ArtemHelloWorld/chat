@@ -1,8 +1,8 @@
 import React, {useState, useEffect, useContext} from 'react'
-import useAxios from '../../utils/useAxios';
-import authContext from '../../context/AuthContext.js';
+import useAxios from '../../../utils/useAxios';
+import authContext from '../../../context/AuthContext.js';
 import ReconnectingEventSource from "reconnecting-eventsource";
-import timestampToTimezone from "../../utils/timestampToTimezone";
+import timestampToTimezone from "../../../utils/timestampToTimezone";
 import {BiCheckDouble, BiCheck} from "react-icons/bi";
 
 export default function ChatList({ selectedChat, setSelectedChat }){

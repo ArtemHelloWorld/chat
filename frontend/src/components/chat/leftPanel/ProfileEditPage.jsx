@@ -1,6 +1,6 @@
 import React, {useContext, useState, useEffect} from 'react';
-import useAxios from "../../../utils/useAxios";
-import AuthContext from "../../../context/AuthContext";
+import useAxios from '../../../utils/useAxios';
+import AuthContext from '../../../context/AuthContext';
 import {MdOutlineAddAPhoto} from 'react-icons/md';
 
 

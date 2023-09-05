@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import useAxios from '../../utils/useAxios';
 
 import LeftPanel from './leftPanel/LeftPanel.jsx';
-import ChatList from './ChatList.jsx';
-import ChatRoom from './ChatRoom.jsx';
+import ChatRoom from './rightPanel/ChatRoom.jsx';
 
 async function fetchChat(username) {
     const api = useAxios();

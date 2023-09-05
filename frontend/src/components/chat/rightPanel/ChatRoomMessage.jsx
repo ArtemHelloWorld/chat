@@ -1,7 +1,7 @@
 import React, {useEffect, useRef} from 'react';
 import { useInView } from 'react-intersection-observer';
-import timestampToTimezone from "../../utils/timestampToTimezone.js";
-import {BiCheckDouble, BiCheck} from "react-icons/bi";
+import timestampToTimezone from '../../../utils/timestampToTimezone.js';
+import {BiCheckDouble, BiCheck} from 'react-icons/bi';
 
 
 function ChatRoomMessage({ message, onMessageRead, position }) {

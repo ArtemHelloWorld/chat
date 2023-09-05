@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, { useEffect, useState} from 'react'
 import useAxios from '../../../utils/useAxios';
 
 export default function UserSearchPage({ selectedChat, setSelectedChat, querySelectorValue }){

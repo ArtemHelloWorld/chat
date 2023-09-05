@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useContext }  from 'react'
-import { scrollToElement, scrollDown } from '../../utils/ScrollDown';
-import AuthContext from '../../context/AuthContext';
-import useAxios from '../../utils/useAxios';
+import { scrollToElement, scrollDown } from '../../../utils/ScrollDown';
+import AuthContext from '../../../context/AuthContext';
+import useAxios from '../../../utils/useAxios';
 import ChatRoomMessage from './ChatRoomMessage.jsx';
-import addUnreadTitle from "../../utils/addTitle";
+import addUnreadTitle from '../../../utils/addTitle';
 import {VscSend} from 'react-icons/vsc'
 
 function PageChats({ selectedChat }) {

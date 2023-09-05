@@ -1,12 +1,12 @@
 import React, { useState, useContext } from 'react';
-import ChatList from "../ChatList";
-import ProfilePage from "./ProfilePage";
-import ProfileEditPage from "./ProfileEditPage";
+import ChatList from './ChatList';
+import ProfilePage from './ProfilePage';
+import ProfileEditPage from './ProfileEditPage';
 import { Dropdown, DropdownButton} from 'react-bootstrap';
 import {IoMdArrowBack} from 'react-icons/io'
 import {MdModeEdit, MdMenu} from 'react-icons/md'
-import AuthContext from "../../../context/AuthContext";
-import UserSearchPage from "./UserSearchPage";
+import AuthContext from '../../../context/AuthContext';
+import UserSearchPage from './UserSearchPage';
 
 const LeftPanel = ({selectedChat, setSelectedChat}) => {
   const [activePanel, setActivePanel] = useState('chat-list');
