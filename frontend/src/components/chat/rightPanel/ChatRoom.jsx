@@ -19,7 +19,7 @@ function PageChats({ selectedChat }) {
 
   const [messageInput, setMessageInput] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
-  const [fileInput, setFileInput] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
   const {user, accessToken} = useContext(AuthContext);
   const api = useAxios();
 
@@ -92,16 +92,33 @@ function PageChats({ selectedChat }) {
   }
 
    const sendInputData = async () => {
-    if(connected && (messageInput || fileInput)){
-      console.log(fileInput, 'ffff');
-      chatSocket.current.send(JSON.stringify({
-        'message': messageInput,
-        'file_id': fileInput,
-      }))
-      setIsTyping(false);
-      setMessageInput('');
-      setFileInput(null);
-    }
+     console.log(filePreview, 'filepreview');
+     if (filePreview){
+        const file_data = await uploadMessageFile(filePreview)
+        console.log(file_data, 'file_data');
+        if (file_data){
+          chatSocket.current.send(JSON.stringify({
+            'message': messageInput,
+            'file_id': file_data['id'],
+          }))
+          setIsTyping(false);
+          setMessageInput('');
+          setFilePreview(null);
+
+        }
+     }
+
+     else {
+       if(connected && messageInput ){
+        chatSocket.current.send(JSON.stringify({
+          'message': messageInput,
+        }))
+        setIsTyping(false);
+        setMessageInput('');
+      }
+     }
+
+
   }
   const markMessageAsRead = async (message) => {
     if(connected){
@@ -154,10 +171,10 @@ function PageChats({ selectedChat }) {
 
   }
   // todo: сохранять только при отправке сообщения
-  const uploadMessageFile = async (event) => {
-    console.log(event.target.files[0])
+  const uploadMessageFile = async (image) => {
+    console.log(image)
     let response = await api.post(`api/v1/message/file/upload/`, {
-      'image': event.target.files[0]
+      'image': image
     },
         {
           headers: {
@@ -173,7 +190,7 @@ function PageChats({ selectedChat }) {
 
   const handlePhotoChange = event => {
     console.log(event.target.files[0])
-    uploadMessageFile(event).then(data => {setFileInput(data['id'])})
+    setFilePreview(event.target.files[0])
 
   };
 
@@ -214,7 +231,13 @@ function PageChats({ selectedChat }) {
 
         <div className="container">
           <div id="message-form" className="input-group input-group-lg mx-auto mb-3 justify-content-end w-50" >
-             <div>
+            { filePreview &&
+                <img
+                  src={URL.createObjectURL(filePreview)}
+                  className="img-fluid mh-100 w-auto p-3 pb-1" alt=""
+                />
+            }
+            <div>
               <label
                   onChange={handlePhotoChange}
                   htmlFor="image"

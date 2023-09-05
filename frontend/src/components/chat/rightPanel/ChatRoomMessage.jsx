@@ -62,7 +62,7 @@ function ChatRoomMessage({ message, onMessageRead, position }) {
                           : message.file
                       )
                 }
-                className="img-fluid mh-100 w-auto p-3 pb-1" alt=""
+                className="img-fluid mh-100 align-self-start w-auto p-3 pb-1" alt=""
               />
           }
           <div ref={inViewRef} className='d-flex justify-content-start'>
