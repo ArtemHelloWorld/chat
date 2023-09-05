@@ -3,7 +3,6 @@ import { scrollToElement, scrollDown } from '../../utils/ScrollDown';
 import AuthContext from '../../context/AuthContext';
 import useAxios from '../../utils/useAxios';
 import ChatRoomMessage from './ChatRoomMessage.jsx';
-import TimestampToTimezone from "../../utils/timestampToTimezone.js";
 import addUnreadTitle from "../../utils/addTitle";
 import {VscSend} from 'react-icons/vsc'
 
@@ -48,7 +47,7 @@ function PageChats({ selectedChat }) {
 
     chatSocket.current.onopen = () => {
       setConnected(true);
-      console.log('Socket connected');
+      console.log('Socket connected', connected);
     }
 
     chatSocket.current.onmessage = (event) => {
@@ -59,15 +58,13 @@ function PageChats({ selectedChat }) {
         setChatMessages(prev => [...prev, data]);
         setToScrollDown(true);
       }
-      else if (data.type === 'online_status') {
-        console.log(data, selectedChat.companion.id)
+      else if (data.type === 'i_am_here') {
         if (data.sender === selectedChat.companion.id) {
-          selectedChat.companion = {...selectedChat.companion, is_online: data.is_online, last_online: data.last_online}
+          selectedChat.companion = {...selectedChat.companion, is_online: data.is_online}
           setCompanion(selectedChat.companion)
         }
       }
       else if (data.type === 'user_typing'){
-        console.log(data)
         if (data.sender === selectedChat.companion.id){
           setIsCompanionTyping(data.typing);
         }
@@ -105,8 +102,8 @@ function PageChats({ selectedChat }) {
   const markMessageAsRead = async (message) => {
     if(connected){
       chatSocket.current.send(JSON.stringify({
-            'mark_message_as_read': message.id,
-        }))
+          'mark_message_as_read': message.id,
+      }))
     }
   }
 
@@ -170,7 +167,7 @@ function PageChats({ selectedChat }) {
           />
           <div className="mx-3">
             <h1 className="p-0 m-0">{companion.username}</h1>
-            <div><small>{isCompanionTyping ? 'Печатает...' : (companion.is_online ? 'Онлайн' : `Был онлайн ${TimestampToTimezone(companion.last_online).toFormat('yyyy-MM-dd в HH:mm')}`)}</small></div>
+            <div><small>{isCompanionTyping ? 'Печатает...' : (companion.is_online ? 'Онлайн' : `Был(a) недавно`)}</small></div>
           </div>
         </div>
 

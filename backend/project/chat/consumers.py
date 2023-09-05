@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
@@ -7,27 +6,144 @@ from django_eventstream import send_event
 
 import chat.models
 import chat.serializers
-import users.models
 
 
-class ChatConsumer(WebsocketConsumer):
-    def update_online_status(self, online_status):
-        user = users.models.User.objects.get(pk=self.scope['user'].pk)
-        user.is_online = online_status
-        user.last_online = int(datetime.now().timestamp() * 1000)
-        user.save()
+class ReceiversMixin:
+    """
+    Методы обработки нового события от пользователя
+    и отправки этого события всем пользователям группы
+    """
+    def message_receiver(self, data_json):
+        message = data_json.get('message')
+        print(f'message: {message}')
 
-        self.scope['user'] = user
+        message_bd = chat.models.Message.objects.create(
+            chat=self.chat_,
+            sender=self.scope['user'],
+            text=message
+        )
+        data = {
+            'type': 'chat_message',
+            'pk': message_bd.pk,
+            'text': message_bd.text,
+            'sender': message_bd.sender.id,
+            'sending_timestamp': message_bd.sending_timestamp
+        }
+        self.chat_.last_message = message_bd
+        self.chat_.save()
+
+        chat_data = {
+            'id': self.chat_.id,
+            'last_message_info': chat.serializers.MessageSerializer(message_bd).data,
+        }
+        send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
+        send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
+
+        async_to_sync(self.channel_layer.group_send)(
+            self.chat_group_name,
+            data
+        )
+
+    def typing_receiver(self, data_json):
+        typing = data_json.get('typing')
+        print(f'Typing: {typing}')
+
+        if typing:
+            self.chat_.status[self.scope['user'].id] = 'Печатает...'
+        else:
+            del self.chat_.status[self.scope['user'].id]
+        self.chat_.save()
+
+        chat_data = {
+            'id': self.chat_.id,
+            'status': self.chat_.status,
+        }
+        # todo: а нужно ли отправлять всем
+        send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
+        send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
+
         async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
             {
-                'type': 'online_status',
+                'type': 'user_typing',
                 'sender': self.scope['user'].id,
-                'is_online': self.scope['user'].is_online,
-                'last_online': self.scope['user'].last_online,
+                'typing': typing,
             }
         )
 
+    def mark_message_as_read_receiver(self, data_json):
+        message_pk = data_json.get('mark_message_as_read')
+        print(f'Mark_message_as_read: {message_pk}')
+
+        message = chat.models.Message.objects.get(pk=message_pk)
+        message.is_read = True
+        message.save()
+        if self.chat_.last_message == message:
+            chat_data = {
+                'id': self.chat_.id,
+                'last_message_info': chat.serializers.MessageSerializer(message).data,
+            }
+            send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
+            send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
+
+        async_to_sync(self.channel_layer.group_send)(
+            self.chat_group_name,
+            {
+                'type': 'mark_message_as_read',
+                'message_pk': message_pk
+            }
+        )
+
+
+class HandlersMixin:
+    """
+    Методы обработки событий, созданных групповой рассылкой
+    """
+    def i_am_here(self, event):
+        data = {
+            'type': 'i_am_here',
+            'sender': event.get('sender'),
+            'is_online': event.get('is_online'),
+        }
+        self.send(text_data=json.dumps(data))
+
+    def who_is_here(self, event):
+        self._group_send_i_am_here(True)
+
+    def chat_message(self, event):
+        data = {
+            'type': 'chat',
+            'id': event.get('pk'),
+            'text': event.get('text'),
+            'sender': event.get('sender'),
+            'sending_timestamp': event.get('sending_timestamp'),
+        }
+
+        self.send(text_data=json.dumps(data))
+
+    def user_typing(self, event):
+        self.send(
+            text_data=json.dumps(
+                {
+                    'type': 'user_typing',
+                    'typing': event.get('typing'),
+                    'sender': event.get('sender'),
+                }
+            )
+        )
+
+    def mark_message_as_read(self, event):
+        self.send(
+            text_data=json.dumps(
+                {
+                    'type': 'mark_message_as_read',
+                    'message_pk': event.get('message_pk')
+                }
+            )
+        )
+
+
+class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
     def connect(self):
         print('connected')
 
@@ -41,12 +157,12 @@ class ChatConsumer(WebsocketConsumer):
         )
         self.accept()
 
-        self.update_online_status(online_status=True)
+        self._group_send_i_am_here(True)
+        self._grop_send_who_is_here()
 
     def disconnect(self, close_code):
         print('disconnected')
-
-        self.update_online_status(online_status=False)
+        self._group_send_i_am_here(os_online=False)
 
         async_to_sync(self.channel_layer.group_discard)(
             self.chat_group_name,
@@ -58,122 +174,29 @@ class ChatConsumer(WebsocketConsumer):
         data_json = json.loads(text_data)
 
         if 'message' in data_json:
-            message = data_json.get('message')
-            print(f'message: {message}')
-
-            message_bd = chat.models.Message.objects.create(
-                chat=self.chat_,
-                sender=self.scope['user'],
-                text=message
-            )
-            data = {
-                'type': 'chat_message',
-                'pk': message_bd.pk,
-                'text': message_bd.text,
-                'sender': message_bd.sender.id,
-                'sending_timestamp': message_bd.sending_timestamp
-            }
-            self.chat_.last_message = message_bd
-            self.chat_.save()
-
-            chat_data = {
-                'id': self.chat_.id,
-                'last_message_info': chat.serializers.MessageSerializer(message_bd).data,
-            }
-            send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
-            send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
-
-            async_to_sync(self.channel_layer.group_send)(self.chat_group_name, data)
+            self.message_receiver(data_json)
 
         elif 'typing' in data_json:
-            typing = data_json.get('typing')
-            print(f'Typing: {typing}')
+            self.typing_receiver(data_json)
 
-            if typing:
-                self.chat_.status[self.scope['user'].id] = 'Печатает...'
-            else:
-                del self.chat_.status[self.scope['user'].id]
-
-            self.chat_.save()
-            chat_data = {
-                'id': self.chat_.id,
-                'status': self.chat_.status,
-            }
-            # todo: а нужно ли отправлять всем
-            send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
-            send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
-
-            async_to_sync(self.channel_layer.group_send)(
-                self.chat_group_name,
-                {
-                    'type': 'user_typing',
-                    'typing': typing,
-                    'sender': self.scope['user'].id
-                }
-            )
         elif 'mark_message_as_read' in data_json:
-            message_pk = data_json.get('mark_message_as_read')
-            print(f'Mark_message_as_read: {message_pk}')
+            self.mark_message_as_read_receiver(data_json)
 
-            message = chat.models.Message.objects.get(pk=message_pk)
-            message.is_read = True
-            message.save()
-            if self.chat_.last_message == message:
-                chat_data = {
-                    'id': self.chat_.id,
-                    'last_message_info': chat.serializers.MessageSerializer(message).data,
-                }
-                send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
-                send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
-
-            async_to_sync(self.channel_layer.group_send)(
-                self.chat_group_name,
-                {
-                    'type': 'mark_message_as_read',
-                    'message_pk': message_pk
-                }
-            )
-
-    def online_status(self, event):
-        data = {
-            'type': 'online_status',
-            'sender': event.get('sender'),
-            'is_online': event.get('is_online'),
-            'last_online': event.get('last_online'),
-        }
-        self.send(text_data=json.dumps(data))
-
-    def chat_message(self, event):
-        # Отправка события 'новое сообщение'
-        data = {
-            'type': 'chat',
-            'id': event.get('pk'),
-            'text': event.get('text'),
-            'sender': event.get('sender'),
-            'sending_timestamp': event.get('sending_timestamp'),
-        }
-
-        self.send(text_data=json.dumps(data))
-
-    def user_typing(self, event):
-        # Отправка события о том, что пользователь начал или закончил печатать
-        self.send(
-            text_data=json.dumps(
-                {
-                    'type': 'user_typing',
-                    'typing': event.get('typing'),
-                    'sender': event.get('sender'),
-                }
-            )
+    def _group_send_i_am_here(self, os_online: bool):
+        async_to_sync(self.channel_layer.group_send)(
+            self.chat_group_name,
+            {
+                'type': 'i_am_here',
+                'sender': self.scope['user'].id,
+                'is_online': os_online,
+            }
         )
 
-    def mark_message_as_read(self, event):
-        # Отправка события о том, что пользователь прочитал сообщение
-        self.send(
-            text_data=json.dumps(
-                {
-                    'type': 'mark_message_as_read',
-                    'message_pk': event.get('message_pk')
-                }
-            )
+    def _grop_send_who_is_here(self):
+        async_to_sync(self.channel_layer.group_send)(
+            self.chat_group_name,
+            {
+                'type': 'who_is_here',
+                'sender': self.scope['user'].id,
+            }
         )
