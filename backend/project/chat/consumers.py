@@ -31,7 +31,7 @@ class ReceiversMixin:
             'type': 'chat_message',
             'pk': message_bd.pk,
             'text': message_bd.text,
-            'file': message_bd.file.image.url,
+            'file': message_bd.file.image.url if  message_bd.file else None,
             'sender': message_bd.sender.id,
             'sending_timestamp': message_bd.sending_timestamp
         }

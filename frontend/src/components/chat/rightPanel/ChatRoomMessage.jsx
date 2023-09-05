@@ -54,6 +54,17 @@ function ChatRoomMessage({ message, onMessageRead, position }) {
            ref={listItemRef}
            className={`message-left px-3 align-self-start w-65 ${message.is_read ? 'read' : 'unread'} ${inView ? 'visible' : ''}`}
         >
+          {message.file &&
+              <img
+                src={
+                      (message.file.indexOf('http') === -1 ?
+                          'http://127.0.0.1:8000' + message.file
+                          : message.file
+                      )
+                }
+                className="img-fluid mh-100 w-auto p-3 pb-1" alt=""
+              />
+          }
           <div ref={inViewRef} className='d-flex justify-content-start'>
             <div className="rounded-3 p-2 black-message text-start" style={{wordBreak: 'break-word'}}>{message.text}
               <div className="align-self-end">

@@ -83,7 +83,7 @@ function SignUpPage() {
       <AuthLayout>
         <div className="mt-md-4">
           <h1 className="fw-bold mb-2">Вы зарегистрировались</h1>
-          <button type="submit" className="btn btn-primary btn-lg px-5 mb-5"><a href="/login">Войти</a></button>
+          <button type="submit" className="btn btn-primary btn-lg px-5 mb-5"><a className="text-decoration-none text-white" href="/login" >Войти</a></button>
         </div>
       </AuthLayout>
     )
