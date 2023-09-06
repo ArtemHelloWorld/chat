@@ -17,7 +17,7 @@ urlpatterns = [
     django.urls.path(
         'api/token/verify/',
         rest_framework_simplejwt.views.TokenVerifyView.as_view(),
-        name='token_verify'
+        name='token_verify',
     ),
     django.urls.path('api/v1/', django.urls.include('users.urls_api')),
     django.urls.path('api/v1/', django.urls.include('chat.urls_api')),

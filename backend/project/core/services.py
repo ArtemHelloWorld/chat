@@ -1,5 +1,6 @@
 import PIL.Image
 
+
 def image_to_rectangle(image_path):
     image = PIL.Image.open(image_path)
     width, height = image.size

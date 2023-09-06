@@ -3,7 +3,9 @@ import django.urls
 import chat.views_api
 
 urlpatterns = [
-    django.urls.path('chat/all/', chat.views_api.ChatAll.as_view(), name='chat-all'),
+    django.urls.path(
+        'chat/all/', chat.views_api.ChatAll.as_view(), name='chat-all'
+    ),
     django.urls.path(
         'chat/user/<str:username>/',
         chat.views_api.ChatUserInfoView.as_view(),

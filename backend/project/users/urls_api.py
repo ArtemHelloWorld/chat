@@ -2,7 +2,6 @@ import django.urls
 
 import users.views_api
 
-
 app_name = 'users'
 
 urlpatterns = [

@@ -19,7 +19,9 @@ class UserRetrieveUpdateAPIView(rest_framework.generics.RetrieveUpdateAPIView):
         if serializer.instance == self.request.user:
             serializer.save()
         else:
-            raise rest_framework.exceptions.PermissionDenied('You can only update your own profile.')
+            raise rest_framework.exceptions.PermissionDenied(
+                'You can only update your own profile.'
+            )
 
 
 class UserSearchListApiView(rest_framework.generics.ListAPIView):
