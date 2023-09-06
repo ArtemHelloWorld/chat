@@ -3,12 +3,34 @@ import django.forms.models
 import django.shortcuts
 import django.test
 import django.urls
+import rest_framework.test
+import rest_framework.authtoken.models
+from rest_framework import status
 
 
 @django.test.override_settings(RATE_LIMIT_MIDDLEWARE=False)
-class MyMiddlewareTestCase(django.test.TestCase):
+class MyMiddlewareTestCase(rest_framework.test.APITestCase):
     def setUp(self):
-        self.client = django.test.Client()
+        response = self.client.post(
+            django.urls.reverse('users:user-create'),
+            {
+                'username': 'admin',
+                'password': 123
+            }
+        )
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        response = self.client.post(
+            django.urls.reverse('token_obtain_pair'),
+            {
+                'username': 'admin',
+                'password': '123'
+            }
+        )
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        token = response.data['access']
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
 
     @classmethod
     def setUpClass(cls):
@@ -17,8 +39,10 @@ class MyMiddlewareTestCase(django.test.TestCase):
     @django.test.override_settings(RATE_LIMIT_MIDDLEWARE=True)
     @django.test.override_settings(REQUESTS_PER_SECOND=2)
     def test_rate_limit_middleware(self):
-        response = self.client.get(django.shortcuts.reverse('users:login'))
+        url = django.urls.reverse('users:profile-read-update', kwargs={'user_id': 1})
+
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.get(django.shortcuts.reverse('users:login'))
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 429)

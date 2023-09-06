@@ -2,6 +2,9 @@ import django.urls
 
 import users.views_api
 
+
+app_name = 'users'
+
 urlpatterns = [
     django.urls.path(
         'user/search/<str:username_filter>/',
