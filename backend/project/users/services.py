@@ -8,6 +8,7 @@ import django.urls
 
 import users.models
 
+
 MESSAGE_REGISTRATION = 'Для завершения регистрации перейдите по ссылке:\n{}'
 MESSAGE_REACTIVATION = (
     'Вы превысили максимальное количество попыток входа в аккаунт.\n'

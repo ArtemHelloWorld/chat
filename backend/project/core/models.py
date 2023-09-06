@@ -1,9 +1,9 @@
-from datetime import datetime
+import datetime
 
-from django.db import models
+import django.db.models
 
 
-class TimestampField(models.PositiveBigIntegerField):
+class TimestampField(django.db.models.PositiveBigIntegerField):
     def __init__(
         self,
         verbose_name=None,
@@ -20,7 +20,7 @@ class TimestampField(models.PositiveBigIntegerField):
 
     def pre_save(self, model_instance, add):
         if self.auto_now or (self.auto_now_add and add):
-            value = int(datetime.now().timestamp() * 1000)
+            value = int(datetime.datetime.now().timestamp() * 1000)
             setattr(model_instance, self.attname, value)
             return value
         else:

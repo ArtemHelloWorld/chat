@@ -1,8 +1,7 @@
-from PIL import Image
-
+import PIL.Image
 
 def image_to_rectangle(image_path):
-    image = Image.open(image_path)
+    image = PIL.Image.open(image_path)
     width, height = image.size
     new_size = min(width, height)
     left = (width - new_size) // 2

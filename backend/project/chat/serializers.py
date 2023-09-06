@@ -2,7 +2,7 @@ import rest_framework
 import rest_framework.serializers
 
 import chat.models
-from users.serializers import ProfileSerializer
+import users.serializers
 
 
 class MessageSerializer(rest_framework.serializers.ModelSerializer):
@@ -48,9 +48,9 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
     def get_companion(self, obj):
         sender = self.context['request'].user
         if obj.user1 == sender:
-            companion_serializer = ProfileSerializer(obj.user2)
+            companion_serializer = users.serializers.ProfileSerializer(obj.user2)
         else:
-            companion_serializer = ProfileSerializer(obj.user1)
+            companion_serializer = users.serializers.ProfileSerializer(obj.user1)
         return companion_serializer.data
 
     def get_last_message_info(self, obj):

@@ -1,11 +1,11 @@
-from rest_framework import serializers
+import rest_framework
 
-from .models import User
+import users.models
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(rest_framework.serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = users.models.User
         fields = [
             'id',
             'username',
@@ -16,17 +16,16 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        # todo: реализовать полноценную регистрацию
         password = validated_data.pop('password')
-        user = User(**validated_data)
+        user = users.models.User(**validated_data)
         user.set_password(password)
         user.save()
         return user
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class ProfileSerializer(rest_framework.serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = users.models.User
         fields = [
             'id',
             'username',

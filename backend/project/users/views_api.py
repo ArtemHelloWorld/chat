@@ -1,15 +1,15 @@
-from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
-from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
-from rest_framework.views import APIView
+import rest_framework.exceptions
+import rest_framework.generics
+import rest_framework.permissions
+import rest_framework.response
+import rest_framework.views
 
 import users.models
 import users.serializers
 
 
 # хорошо сделан
-class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
+class UserRetrieveUpdateAPIView(rest_framework.generics.RetrieveUpdateAPIView):
     queryset = users.models.User.objects.all()
     lookup_url_kwarg = 'user_id'
     lookup_field = 'id'
@@ -19,10 +19,10 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         if serializer.instance == self.request.user:
             serializer.save()
         else:
-            raise PermissionDenied('You can only update your own profile.')
+            raise rest_framework.exceptions.PermissionDenied('You can only update your own profile.')
 
 
-class UserSearchListApiView(ListAPIView):
+class UserSearchListApiView(rest_framework.generics.ListAPIView):
     serializer_class = users.serializers.ProfileSerializer
 
     def get_queryset(self):
@@ -31,11 +31,11 @@ class UserSearchListApiView(ListAPIView):
         )
 
 
-class UserRegisterView(APIView):
-    permission_classes = [AllowAny]
+class UserRegisterView(rest_framework.views.APIView):
+    permission_classes = [rest_framework.permissions.AllowAny]
 
     def post(self, request):
         serializer = users.serializers.UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data)
+        return rest_framework.response.Response(serializer.data)

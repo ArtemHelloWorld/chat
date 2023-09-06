@@ -1,23 +1,23 @@
-from django.db import models
+import django.db.models
 
 import core.models
 import users.models
 
 
-class Message(models.Model):
-    chat = models.ForeignKey(
-        'Chat', on_delete=models.CASCADE, related_name='chat'
+class Message(django.db.models.Model):
+    chat = django.db.models.ForeignKey(
+        'Chat', on_delete=django.db.models.CASCADE, related_name='chat'
     )
-    sender = models.ForeignKey(
+    sender = django.db.models.ForeignKey(
         users.models.User,
-        on_delete=models.CASCADE,
+        on_delete=django.db.models.CASCADE,
         related_name='sent_messages',
     )
-    text = models.TextField(verbose_name='текст сообщения')
-    file = models.ForeignKey(
-        'MessageFile', null=True, on_delete=models.SET_NULL
+    text = django.db.models.TextField(verbose_name='текст сообщения')
+    file = django.db.models.ForeignKey(
+        'MessageFile', null=True, on_delete=django.db.models.SET_NULL
     )
-    is_read = models.BooleanField(default=False)
+    is_read = django.db.models.BooleanField(default=False)
     sending_timestamp = core.models.TimestampField(
         auto_now=True, verbose_name='время отправки сообщения'
     )
@@ -31,27 +31,31 @@ class Message(models.Model):
         ordering = ['sending_timestamp']
 
 
-class MessageFile(models.Model):
-    image = models.ImageField(
+class MessageFile(django.db.models.Model):
+    image = django.db.models.ImageField(
         upload_to='chat_images/%Y/%m/%d', null=True, verbose_name='фотография'
     )
 
 
-class Chat(models.Model):
-    user1 = models.ForeignKey(
-        users.models.User, on_delete=models.CASCADE, related_name='user1'
+class Chat(django.db.models.Model):
+    user1 = django.db.models.ForeignKey(
+        users.models.User,
+        on_delete=django.db.models.CASCADE,
+        related_name='user1',
     )
-    user2 = models.ForeignKey(
-        users.models.User, on_delete=models.CASCADE, related_name='user2'
+    user2 = django.db.models.ForeignKey(
+        users.models.User,
+        on_delete=django.db.models.CASCADE,
+        related_name='user2',
     )
-    last_message = models.ForeignKey(
+    last_message = django.db.models.ForeignKey(
         Message,
-        on_delete=models.SET_NULL,
+        on_delete=django.db.models.SET_NULL,
         null=True,
         related_name='last_message',
         verbose_name='последнее сообщение',
     )
-    status = models.JSONField(
+    status = django.db.models.JSONField(
         default=dict,
         verbose_name='статус, например, что пользователь печатает',
     )
