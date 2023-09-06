@@ -89,12 +89,12 @@ if os.getenv('LOCAL_DB', 'true').lower() in ('true', '1'):
 else:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_NAME'),
-            'USER': os.getenv('POSTGRES_USER'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-            'HOST': os.getenv('POSTGRES_HOST'),
-            'PORT': os.getenv('POSTGRES_PORT'),
+            'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
+            'NAME': os.getenv('SQL_NAME', 'db.sqlite3'),
+            'USER': os.getenv('SQL_USER', 'user'),
+            'PASSWORD': os.getenv('SQL_PASSWORD', 'password'),
+            'HOST': os.getenv('SQL_HOST', 'localhost'),
+            'PORT': os.getenv('SQL_PORT', '5432'),
         }
     }
 
@@ -109,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': (
-            'django.contrib.auth.' 'password_validation.MinimumLengthValidator'
+            'django.contrib.auth.password_validation.MinimumLengthValidator'
         ),
     },
     {
