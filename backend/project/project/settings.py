@@ -79,24 +79,16 @@ TEMPLATES = [
     },
 ]
 
-if os.getenv('LOCAL_DB', 'true').lower() in ('true', '1'):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'db',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.getenv('SQL_NAME', 'db.sqlite3'),
+        'USER': os.getenv('SQL_USER', 'user'),
+        'PASSWORD': os.getenv('SQL_PASSWORD', 'password'),
+        'HOST': os.getenv('SQL_HOST', 'localhost'),
+        'PORT': os.getenv('SQL_PORT', '5432'),
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
-            'NAME': os.getenv('SQL_NAME', 'db.sqlite3'),
-            'USER': os.getenv('SQL_USER', 'user'),
-            'PASSWORD': os.getenv('SQL_PASSWORD', 'password'),
-            'HOST': os.getenv('SQL_HOST', 'localhost'),
-            'PORT': os.getenv('SQL_PORT', '5432'),
-        }
-    }
+}
 
 AUTH_USER_MODEL = 'users.User'
 
