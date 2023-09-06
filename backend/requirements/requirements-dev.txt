@@ -1,0 +1,5 @@
+black==23.1.0
+isort==5.11.3
+flake8==5.0.4
+flake8-import-order==0.18.2
+flake8-quotes==3.3.2
