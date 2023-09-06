@@ -13,6 +13,7 @@ class ReceiversMixin:
     Методы обработки нового события от пользователя
     и отправки этого события всем пользователям группы
     """
+
     def message_receiver(self, data_json):
         message = data_json.get('message')
         file_id = data_json.get('file_id')
@@ -31,23 +32,28 @@ class ReceiversMixin:
             'type': 'chat_message',
             'pk': message_bd.pk,
             'text': message_bd.text,
-            'file': message_bd.file.image.url if  message_bd.file else None,
+            'file': message_bd.file.image.url if message_bd.file else None,
             'sender': message_bd.sender.id,
-            'sending_timestamp': message_bd.sending_timestamp
+            'sending_timestamp': message_bd.sending_timestamp,
         }
         self.chat_.last_message = message_bd
         self.chat_.save()
 
         chat_data = {
             'id': self.chat_.id,
-            'last_message_info': chat.serializers.MessageSerializer(message_bd).data,
+            'last_message_info': chat.serializers.MessageSerializer(
+                message_bd
+            ).data,
         }
-        send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
-        send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
+        send_event(
+            f'notifications-{self.chat_.user1.id}', 'message', chat_data
+        )
+        send_event(
+            f'notifications-{self.chat_.user2.id}', 'message', chat_data
+        )
 
         async_to_sync(self.channel_layer.group_send)(
-            self.chat_group_name,
-            data
+            self.chat_group_name, data
         )
 
     def typing_receiver(self, data_json):
@@ -65,8 +71,12 @@ class ReceiversMixin:
             'status': self.chat_.status,
         }
         # todo: а нужно ли отправлять всем
-        send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
-        send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
+        send_event(
+            f'notifications-{self.chat_.user1.id}', 'message', chat_data
+        )
+        send_event(
+            f'notifications-{self.chat_.user2.id}', 'message', chat_data
+        )
 
         async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
@@ -74,7 +84,7 @@ class ReceiversMixin:
                 'type': 'user_typing',
                 'sender': self.scope['user'].id,
                 'typing': typing,
-            }
+            },
         )
 
     def mark_message_as_read_receiver(self, data_json):
@@ -87,17 +97,20 @@ class ReceiversMixin:
         if self.chat_.last_message == message:
             chat_data = {
                 'id': self.chat_.id,
-                'last_message_info': chat.serializers.MessageSerializer(message).data,
+                'last_message_info': chat.serializers.MessageSerializer(
+                    message
+                ).data,
             }
-            send_event(f'notifications-{self.chat_.user1.id}', 'message', chat_data)
-            send_event(f'notifications-{self.chat_.user2.id}', 'message', chat_data)
+            send_event(
+                f'notifications-{self.chat_.user1.id}', 'message', chat_data
+            )
+            send_event(
+                f'notifications-{self.chat_.user2.id}', 'message', chat_data
+            )
 
         async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
-            {
-                'type': 'mark_message_as_read',
-                'message_pk': message_pk
-            }
+            {'type': 'mark_message_as_read', 'message_pk': message_pk},
         )
 
 
@@ -105,6 +118,7 @@ class HandlersMixin:
     """
     Методы обработки событий, созданных групповой рассылкой
     """
+
     def i_am_here(self, event):
         data = {
             'type': 'i_am_here',
@@ -144,7 +158,7 @@ class HandlersMixin:
             text_data=json.dumps(
                 {
                     'type': 'mark_message_as_read',
-                    'message_pk': event.get('message_pk')
+                    'message_pk': event.get('message_pk'),
                 }
             )
         )
@@ -159,8 +173,7 @@ class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
         self.chat_group_name = f'chat_{self.chat_pk}'
 
         async_to_sync(self.channel_layer.group_add)(
-            self.chat_group_name,
-            self.channel_name
+            self.chat_group_name, self.channel_name
         )
         self.accept()
 
@@ -172,8 +185,7 @@ class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
         self._group_send_i_am_here(os_online=False)
 
         async_to_sync(self.channel_layer.group_discard)(
-            self.chat_group_name,
-            self.channel_name
+            self.chat_group_name, self.channel_name
         )
 
     def receive(self, text_data=None, bytes_data=None):
@@ -196,7 +208,7 @@ class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
                 'type': 'i_am_here',
                 'sender': self.scope['user'].id,
                 'is_online': os_online,
-            }
+            },
         )
 
     def _grop_send_who_is_here(self):
@@ -205,5 +217,5 @@ class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
             {
                 'type': 'who_is_here',
                 'sender': self.scope['user'].id,
-            }
+            },
         )

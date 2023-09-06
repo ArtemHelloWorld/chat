@@ -2,8 +2,6 @@ from channels.auth import AuthMiddlewareStack
 from channels.db import database_sync_to_async
 from channels.middleware import BaseMiddleware
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
-from django.db import close_old_connections
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 from jwt import decode as jwt_decode
@@ -16,7 +14,9 @@ import users.models
 
 @database_sync_to_async
 def get_chat(scope, chat_pk):
-    user_chat = get_object_or_404(chat.models.Chat.objects.select_related('user1', 'user2'), pk=chat_pk)
+    user_chat = get_object_or_404(
+        chat.models.Chat.objects.select_related('user1', 'user2'), pk=chat_pk
+    )
     return user_chat
 
 
@@ -25,7 +25,7 @@ def get_user(validated_token):
     try:
         user = users.models.User.objects.get(id=validated_token['user_id'])
         return user
-    except:
+    except users.models.User.DoesNotExist:
         return None
 
 
@@ -64,10 +64,12 @@ class JwtAuthMiddleware(BaseMiddleware):
 
         try:
             UntypedToken(token)
-        except (InvalidToken, TokenError) as e:
+        except (InvalidToken, TokenError):
             return None
         else:
-            decoded_data = jwt_decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            decoded_data = jwt_decode(
+                token, settings.SECRET_KEY, algorithms=['HS256']
+            )
             user = await get_user(validated_token=decoded_data)
             if not user:
                 return HttpResponseNotFound

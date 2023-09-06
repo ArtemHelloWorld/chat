@@ -1,9 +1,8 @@
-import rest_framework.serializers
 import rest_framework
-
-from users.serializers import ProfileSerializer
+import rest_framework.serializers
 
 import chat.models
+from users.serializers import ProfileSerializer
 
 
 class MessageSerializer(rest_framework.serializers.ModelSerializer):
@@ -11,7 +10,14 @@ class MessageSerializer(rest_framework.serializers.ModelSerializer):
 
     class Meta:
         model = chat.models.Message
-        fields = ['id', 'sender', 'text', 'is_read', 'sending_timestamp', 'file']
+        fields = [
+            'id',
+            'sender',
+            'text',
+            'is_read',
+            'sending_timestamp',
+            'file',
+        ]
 
     def get_file(self, obj):
         if obj.file:
@@ -19,12 +25,25 @@ class MessageSerializer(rest_framework.serializers.ModelSerializer):
 
 
 class ChatSerializer(rest_framework.serializers.ModelSerializer):
-    companion = rest_framework.serializers.SerializerMethodField(allow_null=True)
-    last_message_info = rest_framework.serializers.SerializerMethodField(allow_null=True)
+    companion = rest_framework.serializers.SerializerMethodField(
+        allow_null=True
+    )
+    last_message_info = rest_framework.serializers.SerializerMethodField(
+        allow_null=True
+    )
 
     class Meta:
         model = chat.models.Chat
-        fields = ['id', 'user1', 'user2', 'last_message', 'status', 'created_timestamp', 'companion', 'last_message_info']
+        fields = [
+            'id',
+            'user1',
+            'user2',
+            'last_message',
+            'status',
+            'created_timestamp',
+            'companion',
+            'last_message_info',
+        ]
 
     def get_companion(self, obj):
         sender = self.context['request'].user

@@ -13,7 +13,10 @@ import users.models
 def get_chat_or_create(sender, receiver):
     try:
         chat_obj = chat.models.Chat.objects.get(
-            (django.db.models.Q(user1=sender, user2=receiver) | django.db.models.Q(user1=receiver, user2=sender))
+            (
+                django.db.models.Q(user1=sender, user2=receiver)
+                | django.db.models.Q(user1=receiver, user2=sender)
+            )
         )
 
     except django.core.exceptions.ObjectDoesNotExist:
@@ -29,9 +32,11 @@ class ChatAll(rest_framework.generics.ListAPIView):
 
     def get_queryset(self):
         sender = self.request.user
-        chat_list = (chat.models.Chat.objects.filter(
-            (django.db.models.Q(user1=sender) | django.db.models.Q(user2=sender))
-        )
+        chat_list = chat.models.Chat.objects.filter(
+            (
+                django.db.models.Q(user1=sender)
+                | django.db.models.Q(user2=sender)
+            )
         )
         return chat_list
 
@@ -41,7 +46,9 @@ class ChatUserInfoView(rest_framework.generics.RetrieveAPIView):
 
     def get_object(self):
         sender = self.request.user
-        receiver = django.shortcuts.get_object_or_404(users.models.User, username=self.kwargs['username'])
+        receiver = django.shortcuts.get_object_or_404(
+            users.models.User, username=self.kwargs['username']
+        )
         chat_obj = get_chat_or_create(sender, receiver)
 
         return chat_obj
@@ -52,7 +59,9 @@ class ChatMessagesInfoView(rest_framework.generics.ListCreateAPIView):
     serializer_class = chat.serializers.MessageSerializer
 
     def get_queryset(self):
-        chat_obj = django.shortcuts.get_object_or_404(chat.models.Chat, id=self.kwargs['chat_id'])
+        chat_obj = django.shortcuts.get_object_or_404(
+            chat.models.Chat, id=self.kwargs['chat_id']
+        )
         return chat.models.Message.objects.filter(chat=chat_obj)
 
 
