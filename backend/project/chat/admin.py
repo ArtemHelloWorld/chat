@@ -7,8 +7,6 @@ import chat.models
 class ChatAdmin(django.contrib.admin.ModelAdmin):
     list_display = (
         chat.models.Chat.id.field.name,
-        chat.models.Chat.user1.field.name,
-        chat.models.Chat.user2.field.name,
         chat.models.Chat.last_message.field.name,
         chat.models.Chat.status.field.name,
         chat.models.Chat.created_timestamp.field.name,
