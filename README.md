@@ -5,5 +5,5 @@
 backend: DRF + PostgreSQL </br>
 frontend: React</br>
 
-IN PROGRESS...
+![alt text](https://github.com/ArtemHelloWorld/chat/blob/main/backend/project/db_diagram.png)
 
