@@ -15,7 +15,7 @@ import users.models
 @channels.db.database_sync_to_async
 def get_chat(chat_pk):
     user_chat = django.shortcuts.get_object_or_404(
-        chat.models.Chat.objects.select_related('user1', 'user2'), pk=chat_pk
+        chat.models.Chat.objects.prefetch_related('users'), pk=chat_pk
     )
     return user_chat
 
@@ -44,8 +44,7 @@ class QueryAuthMiddleware:
         return await self.app(self.scope, receive, send)
 
     async def validate_user_permission_in_chat(self):
-        chat_participants = (self.chat_.user1, self.chat_.user2)
-        if self.scope['user'] not in chat_participants:
+        if self.scope['user'] not in self.chat_.users.all():
             return django.http.HttpResponseNotFound
 
     async def update_scope(self):

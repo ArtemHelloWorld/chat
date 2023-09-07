@@ -38,15 +38,8 @@ class MessageFile(django.db.models.Model):
 
 
 class Chat(django.db.models.Model):
-    user1 = django.db.models.ForeignKey(
-        users.models.User,
-        on_delete=django.db.models.CASCADE,
-        related_name='user1',
-    )
-    user2 = django.db.models.ForeignKey(
-        users.models.User,
-        on_delete=django.db.models.CASCADE,
-        related_name='user2',
+    users = django.db.models.ManyToManyField(
+        users.models.User, related_name='users'
     )
     last_message = django.db.models.ForeignKey(
         Message,
@@ -62,6 +55,11 @@ class Chat(django.db.models.Model):
     created_timestamp = core.models.TimestampField(
         auto_now=True, verbose_name='время создания чата'
     )
+
+    # def save(self, *args, **kwargs):
+    #     if self.users.count() != 2:
+    #         raise ValueError("Chat must have exactly 2 users.")
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return f'Чат {self.pk}'

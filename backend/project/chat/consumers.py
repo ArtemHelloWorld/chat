@@ -45,12 +45,8 @@ class ReceiversMixin:
                 message_bd
             ).data,
         }
-        send_event(
-            f'notifications-{self.chat_.user1.id}', 'message', chat_data
-        )
-        send_event(
-            f'notifications-{self.chat_.user2.id}', 'message', chat_data
-        )
+        for user in self.chat_.users.all():
+            send_event(f'notifications-{user.id}', 'message', chat_data)
 
         async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name, data
@@ -63,7 +59,7 @@ class ReceiversMixin:
         if typing:
             self.chat_.status[self.scope['user'].id] = 'Печатает...'
         else:
-            del self.chat_.status[self.scope['user'].id]
+            self.chat_.status.pop(self.scope['user'].id)
         self.chat_.save()
 
         chat_data = {
@@ -71,12 +67,8 @@ class ReceiversMixin:
             'status': self.chat_.status,
         }
         # todo: а нужно ли отправлять всем
-        send_event(
-            f'notifications-{self.chat_.user1.id}', 'message', chat_data
-        )
-        send_event(
-            f'notifications-{self.chat_.user2.id}', 'message', chat_data
-        )
+        for user in self.chat_.users.all():
+            send_event(f'notifications-{user.id}', 'message', chat_data)
 
         async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
@@ -101,12 +93,8 @@ class ReceiversMixin:
                     message
                 ).data,
             }
-            send_event(
-                f'notifications-{self.chat_.user1.id}', 'message', chat_data
-            )
-            send_event(
-                f'notifications-{self.chat_.user2.id}', 'message', chat_data
-            )
+            for user in self.chat_.users.all():
+                send_event(f'notifications-{user.id}', 'message', chat_data)
 
         async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,

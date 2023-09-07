@@ -36,8 +36,6 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
         model = chat.models.Chat
         fields = [
             'id',
-            'user1',
-            'user2',
             'last_message',
             'status',
             'created_timestamp',
@@ -47,13 +45,15 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
 
     def get_companion(self, obj):
         sender = self.context['request'].user
-        if obj.user1 == sender:
+        if sender in obj.users.all():
+            print(obj.users.all())
+
             companion_serializer = users.serializers.ProfileSerializer(
-                obj.user2
+                obj.users.all()[1]
             )
         else:
             companion_serializer = users.serializers.ProfileSerializer(
-                obj.user1
+                obj.users.all()[0]
             )
         return companion_serializer.data
 
