@@ -22,6 +22,13 @@ export const AuthProvider = ({children}) => {
         let username = event.target.username.value;
         let password = event.target.password.value;
 
+        if (!username.length){
+            return {username: 'Введите логин'};
+        }
+        if (!password.length){
+            return {password: 'Введите пароль'};
+        }
+
         let response =  await fetch('http://localhost:8000/api/v1/token/',
         {
           method: 'POST',
@@ -57,10 +64,18 @@ export const AuthProvider = ({children}) => {
         let password = event.target.password.value;
         let passwordRepeat = event.target.passwordRepeat.value;
 
-        if (passwordRepeat !== password){
-            return {password: 'Пароли не совпадают'}
+
+        if (!username.length){
+            return {username: 'Придумайте логин'};
         }
-      
+        if (!password.length){
+            return {password: 'Придумайте пароль'};
+        }
+
+        if (passwordRepeat !== password){
+            return {password: 'Пароли не совпадают'};
+        }
+
         let response =  await fetch('http://localhost:8000/api/v1/user/register/',
             {
             method: 'POST',
