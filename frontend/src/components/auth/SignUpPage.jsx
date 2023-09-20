@@ -14,13 +14,29 @@ function SignUpPage() {
 
   const [formError, setformError] = useState('');
   const [usernameError, setUsernameError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [passwordError, setPasswordError] = useState([]);
 
 
   const handleSignUpUser = (event) => {
     event.preventDefault();
 
-    signUpUser(event).then(response => {
+    let username = event.target.username.value;
+    let password = event.target.password.value;
+    let passwordRepeat = event.target.passwordRepeat.value;
+
+    if (!username.length) {
+          setUsernameError('Придумайте логин');
+    }
+    else if (!password.length) {
+        setPasswordError('Придумайте пароль');
+    }
+
+    else if (passwordRepeat !== password) {
+        setPasswordError('Пароли не совпадают');
+    }
+
+    else {
+      signUpUser(username, password).then(response => {
       if (response === 200){
         setSignUpSuccess(true)
       }
@@ -30,6 +46,9 @@ function SignUpPage() {
         setPasswordError(response['password'])
       }
     });
+    }
+
+
   }
 
   if (!signUpSuccess){
@@ -51,7 +70,14 @@ function SignUpPage() {
                 className="form-control form-control-lg"
               />
           </div>
-          <p id='password_error'>{passwordError}</p>
+          <ul id='password_error'>
+            {passwordError.map((error, index) =>
+                <li key={index}>
+                  {error}
+                </li>
+              )
+            }
+          </ul>
           <div className="form-outline form-white mb-4">
             <input
               type="password"

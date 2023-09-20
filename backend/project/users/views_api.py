@@ -1,10 +1,10 @@
+
 import rest_framework.exceptions
 import rest_framework.generics
 import rest_framework.permissions
 import rest_framework.response
 import rest_framework.status
 
-import core.validators
 import users.models
 import users.serializers
 
@@ -38,13 +38,6 @@ class UserRegisterView(rest_framework.generics.CreateAPIView):
     permission_classes = [rest_framework.permissions.AllowAny]
 
     def post(self, request, *args, **kwargs):
-        password_valid = core.validators.validate_password(request.data.get('password', ''))
-        if password_valid is not True:
-            return rest_framework.response.Response(
-                {'password': password_valid},
-                status=rest_framework.status.HTTP_400_BAD_REQUEST
-            )
-
         serializer = users.serializers.UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
