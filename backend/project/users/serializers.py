@@ -1,7 +1,7 @@
 import django.contrib.auth.password_validation
 import django.core.exceptions
-import rest_framework.serializers
 import rest_framework.response
+import rest_framework.serializers
 import rest_framework.status
 
 import users.models
