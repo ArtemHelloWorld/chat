@@ -6,9 +6,9 @@ app_name = 'users'
 
 urlpatterns = [
     django.urls.path(
-        'user/search/<str:username_filter>/',
-        users.views_api.UserSearchListApiView.as_view(),
-        name='user-search',
+        'user/signup/',
+        users.views_api.UserRegisterView.as_view(),
+        name='user-create',
     ),
     django.urls.path(
         'user/<int:user_id>/',
@@ -16,8 +16,8 @@ urlpatterns = [
         name='profile-read-update',
     ),
     django.urls.path(
-        'user/register/',
-        users.views_api.UserRegisterView.as_view(),
-        name='user-create',
+        'user/search/<str:username_filter>/',
+        users.views_api.UserSearchListApiView.as_view(),
+        name='user-search',
     ),
 ]

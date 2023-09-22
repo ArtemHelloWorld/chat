@@ -1,4 +1,3 @@
-
 import rest_framework.exceptions
 import rest_framework.generics
 import rest_framework.permissions
@@ -36,9 +35,10 @@ class UserSearchListApiView(rest_framework.generics.ListAPIView):
 
 class UserRegisterView(rest_framework.generics.CreateAPIView):
     permission_classes = [rest_framework.permissions.AllowAny]
+    serializer_class = users.serializers.UserSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = users.serializers.UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
         return rest_framework.response.Response(serializer.data)
