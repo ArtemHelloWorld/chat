@@ -58,7 +58,7 @@ export const AuthProvider = ({children}) => {
 
 
     const signUpUser = async (username, password) =>  {
-        let response =  await fetch('http://localhost:8000/api/v1/user/register/',
+        let response =  await fetch('http://localhost:8000/api/v1/user/signup/',
             {
             method: 'POST',
             headers: {
