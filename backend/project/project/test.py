@@ -10,39 +10,19 @@ import rest_framework.test
 
 @django.test.override_settings(RATE_LIMIT_MIDDLEWARE=False)
 class MyMiddlewareTestCase(rest_framework.test.APITestCase):
-    def setUp(self):
-        user_data = {'username': 'admin', 'password': 123}
-
-        response = self.client.post(
-            django.urls.reverse('users:user-create'), user_data
-        )
-        self.assertEqual(
-            rest_framework.status.HTTP_200_OK, response.status_code
-        )
-
-        response = self.client.post(
-            django.urls.reverse('token_obtain_pair'), user_data
-        )
-        self.assertEqual(
-            rest_framework.status.HTTP_200_OK, response.status_code
-        )
-
-        token = response.data['access']
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
-
     @django.test.override_settings(RATE_LIMIT_MIDDLEWARE=True)
     @django.test.override_settings(REQUESTS_PER_SECOND=2)
     def test_rate_limit_middleware(self):
-        url = django.urls.reverse(
-            'users:profile-read-update', kwargs={'user_id': 1}
-        )
+        user1 = {'username': 'admin1', 'password': 'TestPassword1'}
+        user2 = {'username': 'admin2', 'password': 'TestPassword1'}
+        url = django.urls.reverse('users:user-create')
 
-        response = self.client.get(url)
+        response = self.client.post(url, user1)
         self.assertEqual(
             response.status_code, rest_framework.status.HTTP_200_OK
         )
 
-        response = self.client.get(url)
+        response = self.client.post(url, user2)
         self.assertEqual(
             response.status_code,
             rest_framework.status.HTTP_429_TOO_MANY_REQUESTS,

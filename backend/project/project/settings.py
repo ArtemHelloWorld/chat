@@ -118,26 +118,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = [
-    'users.backends.AuthByEmailOrUsernameBackend',
-]
-
-ACTIVATE_USERS = (
-    True if DEBUG else os.getenv('ACTIVATE_USERS', 'False').lower() == 'true'
-)
-
-
-# todo: сделать реальную отправку сообщений
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = BASE_DIR / 'send_mail'
-DEFAULT_FROM_EMAIL = os.getenv('EMAIL_TO_SEND_MESSAGES', 'test@mail.ru')
-
-
-MAX_FAILED_LOGIN_ATTEMPTS = int(os.getenv('MAX_FAILED_LOGIN_ATTEMPTS', 3))
-
-LOGIN_URL = '/users/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = LOGIN_URL
 
 LANGUAGE_CODE = 'ru'
 
@@ -224,3 +204,27 @@ SIMPLE_JWT = {
         'rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer'
     ),
 }
+
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': (
+            'django.contrib.auth.' 'password_validation.MinimumLengthValidator'
+        ),
+        'OPTIONS': {
+            'min_length': 8,
+        },
+    },
+    {
+        'NAME': (
+            'django.contrib.auth.'
+            'password_validation.CommonPasswordValidator'
+        ),
+    },
+    {
+        'NAME': (
+            'django.contrib.auth.'
+            'password_validation.NumericPasswordValidator'
+        ),
+    },
+]

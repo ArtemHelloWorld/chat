@@ -230,13 +230,14 @@ function PageChats({ selectedChat }) {
         </div>
 
         <div className="container">
-          <div id="message-form" className="input-group input-group-lg mx-auto mb-3 justify-content-end w-50" >
-            { filePreview &&
+        { filePreview &&
                 <img
                   src={URL.createObjectURL(filePreview)}
                   className="img-fluid mh-100 w-auto p-3 pb-1" alt=""
                 />
             }
+          <div id="message-form" className="input-group input-group-lg mx-auto mb-3 justify-content-end w-50" >
+
             <div>
               <label
                   onChange={handlePhotoChange}

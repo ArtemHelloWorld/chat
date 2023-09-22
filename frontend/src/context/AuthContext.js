@@ -22,6 +22,13 @@ export const AuthProvider = ({children}) => {
         let username = event.target.username.value;
         let password = event.target.password.value;
 
+        if (!username.length){
+            return {username: 'Введите логин'};
+        }
+        if (!password.length){
+            return {password: 'Введите пароль'};
+        }
+
         let response =  await fetch('http://localhost:8000/api/v1/token/',
         {
           method: 'POST',
@@ -50,18 +57,8 @@ export const AuthProvider = ({children}) => {
 
 
 
-    const signUpUser = async (event) =>  {
-        event.preventDefault();
-        
-        let username = event.target.username.value;
-        let password = event.target.password.value;
-        let passwordRepeat = event.target.passwordRepeat.value;
-
-        if (passwordRepeat !== password){
-            return {password: 'Пароли не совпадают'}
-        }
-      
-        let response =  await fetch('http://localhost:8000/api/v1/user/register/',
+    const signUpUser = async (username, password) =>  {
+        let response =  await fetch('http://localhost:8000/api/v1/user/signup/',
             {
             method: 'POST',
             headers: {
@@ -76,6 +73,7 @@ export const AuthProvider = ({children}) => {
             return 200;
         }
         else {
+            console.log(response_data)
             return response_data;
         }
       }
