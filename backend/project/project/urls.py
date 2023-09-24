@@ -1,7 +1,9 @@
 import django.conf.urls.static
-import django.contrib
+import django.contrib.admin
 import django.urls
 import rest_framework_simplejwt.views
+
+import users.views
 
 urlpatterns = [
     django.urls.path(
@@ -20,11 +22,23 @@ urlpatterns = [
         rest_framework_simplejwt.views.TokenVerifyView.as_view(),
         name='token_verify',
     ),
-    django.urls.path('api/v1/', django.urls.include('users.urls_api')),
+    django.urls.path(
+        'api/v1/user/signup/',
+        users.views.UserCreateAPIView.as_view(),
+        name='user-create',
+    ),
+    django.urls.path(
+        'api/v1/user/search/<str:username_filter>/',
+        users.views.UserSearchListApiView.as_view(),
+        name='user-search',
+    ),
+    django.urls.path(
+        'api/v1/profile/<int:user_id>/',
+        users.views.ProfileRetrieveUpdateAPIView.as_view(),
+        name='profile-read-update',
+    ),
     django.urls.path('api/v1/', django.urls.include('chat.urls_api')),
     django.urls.path('admin/', django.contrib.admin.site.urls),
-]
-urlpatterns += [
     django.urls.path('api-auth/', django.urls.include('rest_framework.urls')),
 ]
 

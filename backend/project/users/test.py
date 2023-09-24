@@ -11,7 +11,17 @@ import users.models
 
 
 @django.test.override_settings(RATE_LIMIT_MIDDLEWARE=False)
-class UserCreateTestCase(rest_framework.test.APITestCase):
+class BaseUserAPITestCase(rest_framework.test.APITestCase):
+    def setUp(self):
+        self.me = users.models.User.objects.create_user('me', 'TestPassword1')
+        self.client.force_authenticate(self.me)
+
+        self.friend = users.models.User.objects.create_user(
+            'friend', 'TestPassword1'
+        )
+
+
+class UserCreateAPITestCase(BaseUserAPITestCase):
     @parameterized.parameterized.expand(
         [
             (
@@ -60,7 +70,7 @@ class UserCreateTestCase(rest_framework.test.APITestCase):
     )
     def test_user_create(self, test_name, username, password, expected_status):
         user = {'username': username, 'password': password}
-        url = django.urls.reverse('users:user-create')
+        url = django.urls.reverse('user-create')
 
         response = self.client.post(url, user)
         self.assertEqual(
@@ -68,62 +78,7 @@ class UserCreateTestCase(rest_framework.test.APITestCase):
         )
 
 
-@django.test.override_settings(RATE_LIMIT_MIDDLEWARE=False)
-class UsersTestCase(rest_framework.test.APITestCase):
-    def setUp(self):
-        self.me = users.models.User.objects.create_user('me', 'TestPassword1')
-        self.client.force_authenticate(self.me)
-
-        self.friend = users.models.User.objects.create_user(
-            'friend', 'TestPassword1'
-        )
-
-    def test_profile_read_myself(self):
-        user_id = self.me.id
-        url = django.urls.reverse(
-            'users:profile-read-update', kwargs={'user_id': user_id}
-        )
-
-        response = self.client.get(url)
-        self.assertEqual(
-            response.status_code, rest_framework.status.HTTP_200_OK
-        )
-
-    def test_profile_read_friend(self):
-        user_id = self.friend.id
-        url = django.urls.reverse(
-            'users:profile-read-update', kwargs={'user_id': user_id}
-        )
-
-        response = self.client.get(url)
-        self.assertEqual(
-            response.status_code, rest_framework.status.HTTP_200_OK
-        )
-
-    def test_profile_update_myself(self):
-        user_id = self.me.id
-        new_user_data = {'username': f'{self.me.username}_new'}
-        url = django.urls.reverse(
-            'users:profile-read-update', kwargs={'user_id': user_id}
-        )
-
-        response = self.client.put(url, new_user_data)
-        self.assertEqual(
-            response.status_code, rest_framework.status.HTTP_200_OK
-        )
-
-    def test_profile_update_friend(self):
-        user_id = self.friend.id
-        new_user_data = {'username': f'{self.friend.username}_new'}
-        url = django.urls.reverse(
-            'users:profile-read-update', kwargs={'user_id': user_id}
-        )
-
-        response = self.client.put(url, new_user_data)
-        self.assertEqual(
-            response.status_code, rest_framework.status.HTTP_403_FORBIDDEN
-        )
-
+class UserSearchTestCase(BaseUserAPITestCase):
     @parameterized.parameterized.expand(
         [
             ('suitable for no username', 'random text', 0),
@@ -141,11 +96,59 @@ class UsersTestCase(rest_framework.test.APITestCase):
         self, test_name, username_filter, suitable_users_count
     ):
         url = django.urls.reverse(
-            'users:user-search', kwargs={'username_filter': username_filter}
+            'user-search', kwargs={'username_filter': username_filter}
         )
         response = self.client.get(url)
         self.assertEqual(
             len(response.data),
             suitable_users_count,
             f'Test {test_name} failed',
+        )
+
+
+class ProfileReadUpdateTestCase(BaseUserAPITestCase):
+    def test_profile_read_myself(self):
+        user_id = self.me.id
+        url = django.urls.reverse(
+            'profile-read-update', kwargs={'user_id': user_id}
+        )
+
+        response = self.client.get(url)
+        self.assertEqual(
+            response.status_code, rest_framework.status.HTTP_200_OK
+        )
+
+    def test_profile_read_friend(self):
+        user_id = self.friend.id
+        url = django.urls.reverse(
+            'profile-read-update', kwargs={'user_id': user_id}
+        )
+
+        response = self.client.get(url)
+        self.assertEqual(
+            response.status_code, rest_framework.status.HTTP_200_OK
+        )
+
+    def test_profile_update_myself(self):
+        user_id = self.me.id
+        new_user_data = {'username': f'{self.me.username}_new'}
+        url = django.urls.reverse(
+            'profile-read-update', kwargs={'user_id': user_id}
+        )
+
+        response = self.client.put(url, new_user_data)
+        self.assertEqual(
+            response.status_code, rest_framework.status.HTTP_200_OK
+        )
+
+    def test_profile_update_friend(self):
+        user_id = self.friend.id
+        new_user_data = {'username': f'{self.friend.username}_new'}
+        url = django.urls.reverse(
+            'profile-read-update', kwargs={'user_id': user_id}
+        )
+
+        response = self.client.put(url, new_user_data)
+        self.assertEqual(
+            response.status_code, rest_framework.status.HTTP_403_FORBIDDEN
         )

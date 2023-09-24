@@ -46,4 +46,3 @@ class ProfileSerializer(rest_framework.serializers.ModelSerializer):
             'bio',
             'profile_image',
         ]
-        # fields += ['email', 'is_online', 'last_online']
