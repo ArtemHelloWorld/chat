@@ -1,4 +1,3 @@
-import rest_framework
 import rest_framework.serializers
 
 import chat.models
@@ -24,6 +23,12 @@ class MessageSerializer(rest_framework.serializers.ModelSerializer):
             return obj.file.image.url
 
 
+class MessageFileSerializer(rest_framework.serializers.ModelSerializer):
+    class Meta:
+        model = chat.models.MessageFile
+        fields = '__all__'
+
+
 class ChatSerializer(rest_framework.serializers.ModelSerializer):
     companion = rest_framework.serializers.SerializerMethodField(
         allow_null=True
@@ -46,8 +51,6 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
     def get_companion(self, obj):
         sender = self.context['request'].user
         if sender in obj.users.all():
-            print(obj.users.all())
-
             companion_serializer = users.serializers.ProfileSerializer(
                 obj.users.all()[1]
             )
@@ -61,9 +64,3 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
         if obj.last_message:
             return MessageSerializer(obj.last_message).data
         return None
-
-
-class MessageFileSerializer(rest_framework.serializers.ModelSerializer):
-    class Meta:
-        model = chat.models.MessageFile
-        fields = '__all__'

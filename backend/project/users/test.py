@@ -96,7 +96,7 @@ class UserSearchTestCase(BaseUserAPITestCase):
         self, test_name, username_filter, suitable_users_count
     ):
         url = django.urls.reverse(
-            'user-search', kwargs={'username_filter': username_filter}
+            'user-search-list', kwargs={'username_filter': username_filter}
         )
         response = self.client.get(url)
         self.assertEqual(

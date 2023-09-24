@@ -26,7 +26,7 @@ def get_chat_or_create(user, companion):
     return chat_obj
 
 
-class ChatAll(rest_framework.generics.ListAPIView):
+class ChatListAPIView(rest_framework.generics.ListAPIView):
     serializer_class = chat.serializers.ChatSerializer
 
     def get_queryset(self):
@@ -37,7 +37,7 @@ class ChatAll(rest_framework.generics.ListAPIView):
         return chat_list
 
 
-class ChatUserInfoView(rest_framework.generics.RetrieveAPIView):
+class ChatUserRetrieveAPIView(rest_framework.generics.RetrieveAPIView):
     serializer_class = chat.serializers.ChatSerializer
 
     def get_object(self):
@@ -50,7 +50,7 @@ class ChatUserInfoView(rest_framework.generics.RetrieveAPIView):
         return chat_obj
 
 
-class ChatMessagesInfoView(rest_framework.generics.ListCreateAPIView):
+class ChatMessagesListCreateAPIView(rest_framework.generics.ListCreateAPIView):
     permission_classes = [core.permissions.HaveMessagePermission]
     serializer_class = chat.serializers.MessageSerializer
 
@@ -61,5 +61,5 @@ class ChatMessagesInfoView(rest_framework.generics.ListCreateAPIView):
         return chat.models.Message.objects.filter(chat=chat_obj)
 
 
-class MessageFileCreate(rest_framework.generics.CreateAPIView):
+class MessageFileCreateAPIView(rest_framework.generics.CreateAPIView):
     serializer_class = chat.serializers.MessageFileSerializer

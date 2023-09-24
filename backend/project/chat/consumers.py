@@ -1,8 +1,9 @@
 import json
 
-from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer
-from django_eventstream import send_event
+import asgiref.sync
+import channels.generic.websocket
+import channels.layers
+import django_eventstream
 
 import chat.models
 import chat.serializers
@@ -13,6 +14,11 @@ class ReceiversMixin:
     Методы обработки нового события от пользователя
     и отправки этого события всем пользователям группы
     """
+
+    chat_: chat.models.Chat
+    scope: dict
+    channel_layer: channels.layers.InMemoryChannelLayer
+    chat_group_name: str
 
     def message_receiver(self, data_json):
         message = data_json.get('message')
@@ -46,9 +52,10 @@ class ReceiversMixin:
             ).data,
         }
         for user in self.chat_.users.all():
-            send_event(f'notifications-{user.id}', 'message', chat_data)
-
-        async_to_sync(self.channel_layer.group_send)(
+            django_eventstream.send_event(
+                f'notifications-{user.id}', 'message', chat_data
+            )
+        asgiref.sync.async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name, data
         )
 
@@ -68,9 +75,11 @@ class ReceiversMixin:
         }
         # todo: а нужно ли отправлять всем
         for user in self.chat_.users.all():
-            send_event(f'notifications-{user.id}', 'message', chat_data)
+            django_eventstream.send_event(
+                f'notifications-{user.id}', 'message', chat_data
+            )
 
-        async_to_sync(self.channel_layer.group_send)(
+        asgiref.sync.async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
             {
                 'type': 'user_typing',
@@ -94,9 +103,11 @@ class ReceiversMixin:
                 ).data,
             }
             for user in self.chat_.users.all():
-                send_event(f'notifications-{user.id}', 'message', chat_data)
+                django_eventstream.send_event(
+                    f'notifications-{user.id}', 'message', chat_data
+                )
 
-        async_to_sync(self.channel_layer.group_send)(
+        asgiref.sync.async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
             {'type': 'mark_message_as_read', 'message_pk': message_pk},
         )
@@ -106,6 +117,12 @@ class HandlersMixin:
     """
     Методы обработки событий, созданных групповой рассылкой
     """
+
+    def send(self, text_data=None, bytes_data=None, close=False):
+        ...
+
+    def _group_send_i_am_here(self, os_online: bool):
+        ...
 
     def i_am_here(self, event):
         data = {
@@ -152,7 +169,9 @@ class HandlersMixin:
         )
 
 
-class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
+class ChatConsumer(
+    ReceiversMixin, HandlersMixin, channels.generic.websocket.WebsocketConsumer
+):
     def connect(self):
         print('connected')
 
@@ -160,7 +179,7 @@ class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
         self.chat_ = self.scope['chat_']
         self.chat_group_name = f'chat_{self.chat_pk}'
 
-        async_to_sync(self.channel_layer.group_add)(
+        asgiref.sync.async_to_sync(self.channel_layer.group_add)(
             self.chat_group_name, self.channel_name
         )
         self.accept()
@@ -172,7 +191,7 @@ class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
         print('disconnected')
         self._group_send_i_am_here(os_online=False)
 
-        async_to_sync(self.channel_layer.group_discard)(
+        asgiref.sync.async_to_sync(self.channel_layer.group_discard)(
             self.chat_group_name, self.channel_name
         )
 
@@ -190,7 +209,7 @@ class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
             self.mark_message_as_read_receiver(data_json)
 
     def _group_send_i_am_here(self, os_online: bool):
-        async_to_sync(self.channel_layer.group_send)(
+        asgiref.sync.async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
             {
                 'type': 'i_am_here',
@@ -200,7 +219,7 @@ class ChatConsumer(ReceiversMixin, HandlersMixin, WebsocketConsumer):
         )
 
     def _grop_send_who_is_here(self):
-        async_to_sync(self.channel_layer.group_send)(
+        asgiref.sync.async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
             {
                 'type': 'who_is_here',
