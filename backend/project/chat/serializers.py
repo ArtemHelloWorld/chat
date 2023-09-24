@@ -24,6 +24,12 @@ class MessageSerializer(rest_framework.serializers.ModelSerializer):
             return obj.file.image.url
 
 
+class MessageFileSerializer(rest_framework.serializers.ModelSerializer):
+    class Meta:
+        model = chat.models.MessageFile
+        fields = '__all__'
+
+
 class ChatSerializer(rest_framework.serializers.ModelSerializer):
     companion = rest_framework.serializers.SerializerMethodField(
         allow_null=True
@@ -61,9 +67,3 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
         if obj.last_message:
             return MessageSerializer(obj.last_message).data
         return None
-
-
-class MessageFileSerializer(rest_framework.serializers.ModelSerializer):
-    class Meta:
-        model = chat.models.MessageFile
-        fields = '__all__'

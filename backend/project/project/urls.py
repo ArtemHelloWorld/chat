@@ -4,6 +4,7 @@ import django.urls
 import rest_framework_simplejwt.views
 
 import users.views
+import chat.views
 
 urlpatterns = [
     django.urls.path(
@@ -30,14 +31,33 @@ urlpatterns = [
     django.urls.path(
         'api/v1/user/search/<str:username_filter>/',
         users.views.UserSearchListApiView.as_view(),
-        name='user-search',
+        name='user-search-list',
     ),
     django.urls.path(
         'api/v1/profile/<int:user_id>/',
         users.views.ProfileRetrieveUpdateAPIView.as_view(),
         name='profile-read-update',
     ),
-    django.urls.path('api/v1/', django.urls.include('chat.urls_api')),
+    django.urls.path(
+        'chat/all/',
+        chat.views.ChatListAPIView.as_view(),
+        name='chat-all-list',
+    ),
+    django.urls.path(
+        'chat/user/<str:username>/',
+        chat.views.ChatUserRetrieveAPIView.as_view(),
+        name='chat-user-read',
+    ),
+    django.urls.path(
+        'chat/<int:chat_id>/messages/',
+        chat.views.ChatMessagesListCreateAPIView.as_view(),
+        name='messages-list-create',
+    ),
+    django.urls.path(
+        'message/file/upload/',
+        chat.views.MessageFileCreateAPIView.as_view(),
+        name='message-file-create',
+    ),
     django.urls.path('admin/', django.contrib.admin.site.urls),
     django.urls.path('api-auth/', django.urls.include('rest_framework.urls')),
 ]

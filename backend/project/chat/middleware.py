@@ -54,11 +54,10 @@ class QueryAuthMiddleware:
 
 class JwtAuthMiddleware(channels.middleware.BaseMiddleware):
     def __init__(self, inner):
+        super().__init__(inner)
         self.inner = inner
 
     async def __call__(self, scope, receive, send):
-        # close_old_connections()
-
         token = scope['path'].rstrip('/').split('/')[-2]
 
         try:

@@ -1,5 +1,6 @@
 import json
 
+import channels.layers
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 from django_eventstream import send_event
@@ -13,6 +14,11 @@ class ReceiversMixin:
     Методы обработки нового события от пользователя
     и отправки этого события всем пользователям группы
     """
+
+    chat_: chat.models.Chat
+    scope: dict
+    channel_layer: channels.layers.InMemoryChannelLayer
+    chat_group_name: str
 
     def message_receiver(self, data_json):
         message = data_json.get('message')
@@ -47,7 +53,6 @@ class ReceiversMixin:
         }
         for user in self.chat_.users.all():
             send_event(f'notifications-{user.id}', 'message', chat_data)
-
         async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name, data
         )
@@ -106,6 +111,12 @@ class HandlersMixin:
     """
     Методы обработки событий, созданных групповой рассылкой
     """
+
+    def send(self, text_data=None, bytes_data=None, close=False):
+        ...
+
+    def _group_send_i_am_here(self, os_online: bool):
+        ...
 
     def i_am_here(self, event):
         data = {
