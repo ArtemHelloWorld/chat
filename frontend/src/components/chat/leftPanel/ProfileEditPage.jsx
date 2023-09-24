@@ -12,8 +12,8 @@ function ProfileEditPage({setActivePanel}) {
   const [formData, setFormData] = useState({});
   const [formError, setFormError] = useState('');
 
-  async function fetchUser() {
-    let response = await api.get(`api/v1/user/${user.user_id}/`);
+  async function fetchProfile() {
+    let response = await api.get(`api/v1/profile/${user.user_id}/`);
     if (response.status === 200){
       return response.data;
     }
@@ -56,7 +56,7 @@ function ProfileEditPage({setActivePanel}) {
 
 
   useEffect(() => {
-    fetchUser().then(response => {
+    fetchProfile().then(response => {
       setProfile(response);
       setFormData(response);
     })

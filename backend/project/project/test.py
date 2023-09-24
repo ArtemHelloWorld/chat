@@ -15,7 +15,7 @@ class MyMiddlewareTestCase(rest_framework.test.APITestCase):
     def test_rate_limit_middleware(self):
         user1 = {'username': 'admin1', 'password': 'TestPassword1'}
         user2 = {'username': 'admin2', 'password': 'TestPassword1'}
-        url = django.urls.reverse('users:user-create')
+        url = django.urls.reverse('user-create')
 
         response = self.client.post(url, user1)
         self.assertEqual(
