@@ -51,8 +51,6 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
     def get_companion(self, obj):
         sender = self.context['request'].user
         if sender in obj.users.all():
-            print(obj.users.all())
-
             companion_serializer = users.serializers.ProfileSerializer(
                 obj.users.all()[1]
             )
