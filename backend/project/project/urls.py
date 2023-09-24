@@ -3,8 +3,8 @@ import django.contrib.admin
 import django.urls
 import rest_framework_simplejwt.views
 
-import users.views
 import chat.views
+import users.views
 
 urlpatterns = [
     django.urls.path(

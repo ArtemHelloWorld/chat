@@ -1,4 +1,3 @@
-import rest_framework
 import rest_framework.serializers
 
 import chat.models
