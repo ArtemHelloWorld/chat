@@ -25,46 +25,46 @@ class UserCreateAPITestCase(BaseUserAPITestCase):
     @parameterized.parameterized.expand(
         [
             (
-                    'no username, password',
-                    '',
-                    '',
-                    rest_framework.status.HTTP_400_BAD_REQUEST,
+                'no username, password',
+                '',
+                '',
+                rest_framework.status.HTTP_400_BAD_REQUEST,
             ),
             (
-                    'no username',
-                    '',
-                    'TestPassword1',
-                    rest_framework.status.HTTP_400_BAD_REQUEST,
+                'no username',
+                '',
+                'TestPassword1',
+                rest_framework.status.HTTP_400_BAD_REQUEST,
             ),
             (
-                    'no password',
-                    'username',
-                    '',
-                    rest_framework.status.HTTP_400_BAD_REQUEST,
+                'no password',
+                'username',
+                '',
+                rest_framework.status.HTTP_400_BAD_REQUEST,
             ),
             (
-                    'short(1) password',
-                    'username',
-                    't',
-                    rest_framework.status.HTTP_400_BAD_REQUEST,
+                'short(1) password',
+                'username',
+                't',
+                rest_framework.status.HTTP_400_BAD_REQUEST,
             ),
             (
-                    'short(7) password',
-                    'username',
-                    'TestPa1',
-                    rest_framework.status.HTTP_400_BAD_REQUEST,
+                'short(7) password',
+                'username',
+                'TestPa1',
+                rest_framework.status.HTTP_400_BAD_REQUEST,
             ),
             (
-                    'numeric password',
-                    'username',
-                    '123456789101112',
-                    rest_framework.status.HTTP_400_BAD_REQUEST,
+                'numeric password',
+                'username',
+                '123456789101112',
+                rest_framework.status.HTTP_400_BAD_REQUEST,
             ),
             (
-                    'hard password',
-                    'username',
-                    'TestPassword1',
-                    rest_framework.status.HTTP_200_OK,
+                'hard password',
+                'username',
+                'TestPassword1',
+                rest_framework.status.HTTP_200_OK,
             ),
         ]
     )
@@ -93,7 +93,7 @@ class UserSearchTestCase(BaseUserAPITestCase):
         ]
     )
     def test_user_search(
-            self, test_name, username_filter, suitable_users_count
+        self, test_name, username_filter, suitable_users_count
     ):
         url = django.urls.reverse(
             'user-search', kwargs={'username_filter': username_filter}
