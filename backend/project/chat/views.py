@@ -12,17 +12,22 @@ import users.models
 
 def get_chat_or_create(user, companion):
     try:
-        chat_obj = chat.models.Chat.objects.get(
-            (
-                django.db.models.Q(users=user)
-                & django.db.models.Q(users=companion)
-            )
+        chat_obj = chat.models.Chat.objects.filter(
+            users=user
+        ).get(
+            users=companion
         )
-
     except django.core.exceptions.ObjectDoesNotExist:
         chat_obj = chat.models.Chat.objects.create()
         chat_obj.users.add(user, companion)
-
+    except django.core.exceptions.MultipleObjectsReturned:
+        print('MultipleObjectsReturned', 'chat.models.Chat', user, companion)
+        chat_list = chat.models.Chat.objects.filter(
+            users=user
+        ).filter(
+            users=companion
+        ).order_by('-created_timestamp')
+        return chat_list[0]
     return chat_obj
 
 
