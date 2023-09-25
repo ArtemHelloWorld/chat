@@ -50,7 +50,7 @@ function ProfileEditPage({setActivePanel}) {
       }
     }
 
-    api.patch(`/api/v1/user/${user.user_id}/`, formDataToSend)
+    api.patch(`/api/v1/profile/${user.user_id}/`, formDataToSend)
       .then(response => {
         setActivePanel("profile")
       })
