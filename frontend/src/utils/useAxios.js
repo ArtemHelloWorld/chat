@@ -1,7 +1,7 @@
-import axios from "axios";
-import {useContext} from "react";
-// import jwt_decode from "jwt-decode";
-import AuthContext from "../context/AuthContext";
+import axios from "axios"
+import {useContext} from "react"
+// import jwt_decode from "jwt-decode"
+import AuthContext from "../context/AuthContext"
 
 
 const baseURL = "http://127.0.0.1:8000/"
@@ -10,7 +10,7 @@ const baseURL = "http://127.0.0.1:8000/"
 
 
 const useAxios = () => {
-    const {accessToken} = useContext(AuthContext);
+    const {accessToken} = useContext(AuthContext)
     
     const AxiosInstance = axios.create({
       baseURL, 
@@ -28,11 +28,11 @@ const useAxios = () => {
     //     console.log(response.status)
     //     if (response.status === 200){
     //       console.log(response.data.access)
-    //       return response.data.access;
+    //       return response.data.access
     //     }
     //     else {
-    //         logoutUser();
-    //         return null;
+    //         logoutUser()
+    //         return null
     //     }
     //   }
     // }
@@ -43,33 +43,33 @@ const useAxios = () => {
     // AxiosInstance.interceptors.response.use(
     //     (response) => {
     //       console.log('response(((')
-    //         return response;
+    //         return response
 
     //       },
     //       async (error) => {
     //         console.log('expired')
-    //         const originalRequest = error.config;
+    //         const originalRequest = error.config
         
     //         if (error.response.status === 401 && !originalRequest._retry) {
-    //           originalRequest._retry = true;
+    //           originalRequest._retry = true
               
-    //             const newToken = await refreshAccessToken();
+    //             const newToken = await refreshAccessToken()
     //             console.log(newToken, 'newToken')
     //             if (newToken) {
-    //               originalRequest.headers.Authorization = `Bearer ${newToken}`;
-    //               setAccessToken(newToken);
-    //               setUser(jwt_decode(newToken));
-    //               localStorage.setItem('accessToken', newToken);
+    //               originalRequest.headers.Authorization = `Bearer ${newToken}`
+    //               setAccessToken(newToken)
+    //               setUser(jwt_decode(newToken))
+    //               localStorage.setItem('accessToken', newToken)
   
           
-    //               return AxiosInstance(originalRequest);
+    //               return AxiosInstance(originalRequest)
     //             }
     //           }
-    //         return Promise.reject(error);
+    //         return Promise.reject(error)
     //     }
     // )
     
-    return AxiosInstance;
+    return AxiosInstance
 }
 
-export default useAxios;
+export default useAxios

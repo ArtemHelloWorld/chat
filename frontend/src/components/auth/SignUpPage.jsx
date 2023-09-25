@@ -1,43 +1,43 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState} from 'react'
 
-import AuthContext from '../../context/AuthContext.js';
-import AuthLayout from './AuthLayout.jsx';
+import AuthContext from '../../context/AuthContext.js'
+import AuthLayout from './AuthLayout.jsx'
 
 
 
 function SignUpPage() {
-  const {signUpUser} = useContext(AuthContext);
+  const {signUpUser} = useContext(AuthContext)
 
-  const [signUpSuccess, setSignUpSuccess] = useState(false);
+  const [signUpSuccess, setSignUpSuccess] = useState(false)
 
-  const [formError, setFormError] = useState('');
-  const [usernameError, setUsernameError] = useState('');
-  const [passwordErrors, setPasswordErrors] = useState([]);
+  const [formError, setFormError] = useState('')
+  const [usernameError, setUsernameError] = useState('')
+  const [passwordErrors, setPasswordErrors] = useState([])
 
   function clearErrors() {
-    setFormError('');
-    setUsernameError('');
-    setPasswordErrors([]);
+    setFormError('')
+    setUsernameError('')
+    setPasswordErrors([])
 
   }
   const handleSignUpUser = (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    let username = event.target.username.value;
-    let password = event.target.password.value;
-    let passwordRepeat = event.target.passwordRepeat.value;
+    let username = event.target.username.value
+    let password = event.target.password.value
+    let passwordRepeat = event.target.passwordRepeat.value
 
     clearErrors()
 
     if (!username.length) {
-          setUsernameError('Придумайте логин');
+          setUsernameError('Придумайте логин')
     }
     else if (!password.length) {
-        setPasswordErrors(['Придумайте пароль']);
+        setPasswordErrors(['Придумайте пароль'])
     }
 
     else if (passwordRepeat !== password) {
-        setPasswordErrors(['Пароли не совпадают']);
+        setPasswordErrors(['Пароли не совпадают'])
     }
 
     else {
@@ -50,7 +50,7 @@ function SignUpPage() {
           setUsernameError(response_data['username'])
           setPasswordErrors(response_data['password'])
         }
-      });
+      })
     }
   }
 
@@ -108,7 +108,7 @@ function SignUpPage() {
         </div>
       </div>
     </AuthLayout>
-    );
+    )
   }
   else{
     return (
@@ -122,4 +122,4 @@ function SignUpPage() {
   }
 }
 
-export default SignUpPage;
+export default SignUpPage

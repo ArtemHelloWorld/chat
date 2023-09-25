@@ -1,15 +1,15 @@
 import React, { useEffect, useState} from 'react'
-import useAxios from '../../../utils/useAxios';
+import useAxios from '../../../utils/useAxios'
 
 export default function UserSearchPage({ selectedChat, setSelectedChat, querySelectorValue }){
-  const [users, setUsers] = useState([]);
-  const api = useAxios();
+  const [users, setUsers] = useState([])
+  const api = useAxios()
 
 
   async function fetchChats(querySelectorValue) {
-    let response = await api.get(`api/v1/user/search/${querySelectorValue}/`);
+    let response = await api.get(`api/v1/user/search/${querySelectorValue}/`)
     if (response.status === 200){
-      console.log(response.data);
+      console.log(response.data)
       return response.data
     }
   }
@@ -23,12 +23,12 @@ export default function UserSearchPage({ selectedChat, setSelectedChat, querySel
       else {
         setUsers([])
       }
-  }, [querySelectorValue]);
+  }, [querySelectorValue])
 
   async function handleUserClick(user) {
-    let response = await api.get(`api/v1/chat/user/${user.username}/`);
+    let response = await api.get(`api/v1/chat/user/${user.username}/`)
     if (response.status === 200){
-      setSelectedChat(response.data);
+      setSelectedChat(response.data)
     }
   }
 
@@ -72,7 +72,7 @@ export default function UserSearchPage({ selectedChat, setSelectedChat, querySel
             ))}
           </ul>
         </div>
-    );
+    )
   }
   else{
     return (

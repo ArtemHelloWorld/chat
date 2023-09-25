@@ -1,25 +1,25 @@
-import React, { useContext, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import React, { useContext, useState } from 'react'
+import { useNavigate } from "react-router-dom"
 
-import AuthContext from '../../context/AuthContext.js';
-import AuthLayout from './AuthLayout.jsx';
+import AuthContext from '../../context/AuthContext.js'
+import AuthLayout from './AuthLayout.jsx'
 
 
 function LoginPage() {
-  let navigate = useNavigate();
-  const {loginUser} = useContext(AuthContext);
+  let navigate = useNavigate()
+  const {loginUser} = useContext(AuthContext)
 
-  const [formError, setFormError] = useState('');
-  const [usernameError, setUsernameError] = useState('');
-  const [passwordErrors, setPasswordErrors] = useState([]);
+  const [formError, setFormError] = useState('')
+  const [usernameError, setUsernameError] = useState('')
+  const [passwordErrors, setPasswordErrors] = useState([])
 
   function clearErrors() {
-    setFormError('');
-    setUsernameError('');
-    setPasswordErrors([]);
+    setFormError('')
+    setUsernameError('')
+    setPasswordErrors([])
   }
   const handleLoginSubmit = (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     let username = event.target.username.value
     let password = event.target.password.value
@@ -42,9 +42,9 @@ function LoginPage() {
             setPasswordErrors(response_data['password'])
           }
         }
-      );
+      )
     }
-  };
+  }
   
   return (
     <AuthLayout>
@@ -91,7 +91,7 @@ function LoginPage() {
         </div>
       </div>
     </AuthLayout>       
-  );
+  )
 }
 
-export default LoginPage;
+export default LoginPage

@@ -1,18 +1,18 @@
 import React, {useState, useEffect, useContext} from 'react'
-import useAxios from '../../../utils/useAxios';
-import authContext from '../../../context/AuthContext.js';
-import ReconnectingEventSource from "reconnecting-eventsource";
-import timestampToTimezone from "../../../utils/timestampToTimezone";
-import {BiCheckDouble, BiCheck} from "react-icons/bi";
+import useAxios from '../../../utils/useAxios'
+import authContext from '../../../context/AuthContext.js'
+import ReconnectingEventSource from "reconnecting-eventsource"
+import timestampToTimezone from "../../../utils/timestampToTimezone"
+import {BiCheckDouble, BiCheck} from "react-icons/bi"
 
 export default function ChatList({ selectedChat, setSelectedChat }){
-  const [chats, setChats] = useState([]);
-  const {user, accessToken} = useContext(authContext);
-  const api = useAxios();
+  const [chats, setChats] = useState([])
+  const {user, accessToken} = useContext(authContext)
+  const api = useAxios()
 
 
   async function fetchChats() {
-    let response = await api.get('api/v1/chat/all/');
+    let response = await api.get('api/v1/chat/all/')
     if (response.status === 200){
       return response.data
     }
@@ -26,32 +26,32 @@ export default function ChatList({ selectedChat, setSelectedChat }){
     )
 
 
-    const eventSource = new ReconnectingEventSource(`http://127.0.0.1:8000/api/v1/chat/notifications/${user.user_id}/${accessToken}/events/`);
+    const eventSource = new ReconnectingEventSource(`http://127.0.0.1:8000/api/v1/chat/notifications/${user.user_id}/${accessToken}/events/`)
     eventSource.onopen = () => {
       console.log('eventSource open', eventSource)
 
     }
     eventSource.onmessage = (event) => {
-       const data = JSON.parse(event.data);
-       console.log('eventSource message:', data);
+       const data = JSON.parse(event.data)
+       console.log('eventSource message:', data)
        if ('last_message_info' in data){
          setChats(prev => [...prev.map(chat => chat.id === data.id ? {...chat, last_message_info: data.last_message_info} : {...chat})])
        }
        else if ('status' in data){
          setChats(prev => [...prev.map(chat => chat.id === data.id ? {...chat, status: data.status} : {...chat})])
        }
-    };
+    }
     eventSource.onerror = () => {
-       console.log('eventSource error');
-       eventSource.close();
+       console.log('eventSource error')
+       eventSource.close()
     }
      eventSource.addEventListener('stream-error', function (e) {
-          eventSource.close();
-        }, false);
+          eventSource.close()
+        }, false)
      eventSource.addEventListener('keep-alive', function (e) {
           console.log(e, 'stream-reset')
-        }, false);
-  }, []);
+        }, false)
+  }, [])
 
 
   const getChatDescription = (chat) => {
@@ -82,8 +82,8 @@ export default function ChatList({ selectedChat, setSelectedChat }){
   }
 
   const handleChatClick = (chat) => {
-    setSelectedChat(chat);
-  };
+    setSelectedChat(chat)
+  }
 
   if(chats) {
     return (
@@ -132,7 +132,7 @@ export default function ChatList({ selectedChat, setSelectedChat }){
             ))}
           </ul>
         </div>
-    );
+    )
   }
   else{
     return (

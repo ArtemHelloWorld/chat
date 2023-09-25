@@ -1,17 +1,17 @@
-import React, { useState, useContext } from 'react';
-import ChatList from './ChatList';
-import ProfilePage from './ProfilePage';
-import ProfileEditPage from './ProfileEditPage';
-import { Dropdown, DropdownButton} from 'react-bootstrap';
+import React, { useState, useContext } from 'react'
+import ChatList from './ChatList'
+import ProfilePage from './ProfilePage'
+import ProfileEditPage from './ProfileEditPage'
+import { Dropdown, DropdownButton} from 'react-bootstrap'
 import {IoMdArrowBack} from 'react-icons/io'
 import {MdModeEdit, MdMenu} from 'react-icons/md'
-import AuthContext from '../../../context/AuthContext';
-import UserSearchPage from './UserSearchPage';
+import AuthContext from '../../../context/AuthContext'
+import UserSearchPage from './UserSearchPage'
 
 const LeftPanel = ({selectedChat, setSelectedChat}) => {
-  const [activePanel, setActivePanel] = useState('chat-list');
+  const [activePanel, setActivePanel] = useState('chat-list')
   const {logoutUser} = useContext(AuthContext)
-  const [querySelectorValue, setQuerySelectorValue] = useState('');
+  const [querySelectorValue, setQuerySelectorValue] = useState('')
 
   return (
       <>
@@ -45,7 +45,7 @@ const LeftPanel = ({selectedChat, setSelectedChat}) => {
                     className="form-control shadow-none border-dark black-dark-bg rounded-pill"
                     placeholder="Поиск"
                     value={querySelectorValue}
-                    onChange={event => {setQuerySelectorValue(event.target.value);}}
+                    onChange={event => {setQuerySelectorValue(event.target.value)}}
                     >
                   </input>
               </div>
@@ -74,7 +74,7 @@ const LeftPanel = ({selectedChat, setSelectedChat}) => {
             </>
         }
       </>
-  );
+  )
 }
 
-export default LeftPanel;
+export default LeftPanel

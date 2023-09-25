@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 const AuthLayout = ({ children }) => {
   return (
@@ -19,7 +19,7 @@ const AuthLayout = ({ children }) => {
         </section>
       </div>
     </main>
-  );
-};
+  )
+}
 
-export default AuthLayout;
+export default AuthLayout

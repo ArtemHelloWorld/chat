@@ -1,34 +1,34 @@
 import React, { useState, useEffect, useRef, useContext }  from 'react'
-import { scrollToElement, scrollDown } from '../../../utils/ScrollDown';
-import AuthContext from '../../../context/AuthContext';
-import useAxios from '../../../utils/useAxios';
-import ChatRoomMessage from './ChatRoomMessage.jsx';
-import addUnreadTitle from '../../../utils/addTitle';
+import { scrollToElement, scrollDown } from '../../../utils/ScrollDown'
+import AuthContext from '../../../context/AuthContext'
+import useAxios from '../../../utils/useAxios'
+import ChatRoomMessage from './ChatRoomMessage.jsx'
+import addUnreadTitle from '../../../utils/addTitle'
 import {VscSend} from 'react-icons/vsc'
-import {MdOutlineAddAPhoto} from 'react-icons/md';
+import {MdOutlineAddAPhoto} from 'react-icons/md'
 
 function PageChats({ selectedChat }) {
-  const chatSocket = useRef();
-  const [connected, setConnected] = useState(false);
-  const [toScrollDown, setToScrollDown] = useState(false);
+  const chatSocket = useRef()
+  const [connected, setConnected] = useState(false)
+  const [toScrollDown, setToScrollDown] = useState(false)
 
-  const [isTyping, setIsTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false)
   const [timerId, setTimerId] = useState(null)
   const [companion, setCompanion] = useState({})
-  const [isCompanionTyping, setIsCompanionTyping] = useState(false);
+  const [isCompanionTyping, setIsCompanionTyping] = useState(false)
 
-  const [messageInput, setMessageInput] = useState('');
-  const [chatMessages, setChatMessages] = useState([]);
-  const [filePreview, setFilePreview] = useState(null);
-  const {user, accessToken} = useContext(AuthContext);
-  const api = useAxios();
+  const [messageInput, setMessageInput] = useState('')
+  const [chatMessages, setChatMessages] = useState([])
+  const [filePreview, setFilePreview] = useState(null)
+  const {user, accessToken} = useContext(AuthContext)
+  const api = useAxios()
 
 
 
   async function fetchMessages() {
-    let response = await api.get(`api/v1/chat/${selectedChat.id}/messages/`);
+    let response = await api.get(`api/v1/chat/${selectedChat.id}/messages/`)
     if (response.status === 200){
-      return response.data;
+      return response.data
     }
   }
 
@@ -37,27 +37,27 @@ function PageChats({ selectedChat }) {
 
     if (chatSocket.current) {
       if (chatSocket.current.url !== url) {
-        chatSocket.current.close();
+        chatSocket.current.close()
       }
     }
-    return new WebSocket(url);
+    return new WebSocket(url)
   }
 
   function loadWebSocket(chat_id){
-    chatSocket.current = newWebSocket(chat_id);
+    chatSocket.current = newWebSocket(chat_id)
 
     chatSocket.current.onopen = () => {
-      setConnected(true);
-      console.log('Socket connected', connected);
+      setConnected(true)
+      console.log('Socket connected', connected)
     }
 
     chatSocket.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+      const data = JSON.parse(event.data)
       console.log(data)
       if(data.type === 'chat'){
         console.log('onmessage', event.data)
-        setChatMessages(prev => [...prev, data]);
-        setToScrollDown(true);
+        setChatMessages(prev => [...prev, data])
+        setToScrollDown(true)
       }
       else if (data.type === 'i_am_here') {
         if (data.sender === selectedChat.companion.id) {
@@ -67,7 +67,7 @@ function PageChats({ selectedChat }) {
       }
       else if (data.type === 'user_typing'){
         if (data.sender === selectedChat.companion.id){
-          setIsCompanionTyping(data.typing);
+          setIsCompanionTyping(data.typing)
         }
       }
       else if (data.type === 'mark_message_as_read'){
@@ -75,11 +75,11 @@ function PageChats({ selectedChat }) {
       }
     }
     chatSocket.current.onclose = (event) => {
-      setConnected(false);
-      console.log('Socket clost');
+      setConnected(false)
+      console.log('Socket clost')
     }
     chatSocket.current.onerror = (event) => {
-      console.log('Socket error');
+      console.log('Socket error')
     }
   }
 
@@ -92,18 +92,18 @@ function PageChats({ selectedChat }) {
   }
 
    const sendInputData = async () => {
-     console.log(filePreview, 'filepreview');
+     console.log(filePreview, 'filepreview')
      if (filePreview){
         const file_data = await uploadMessageFile(filePreview)
-        console.log(file_data, 'file_data');
+        console.log(file_data, 'file_data')
         if (file_data){
           chatSocket.current.send(JSON.stringify({
             'message': messageInput,
             'file_id': file_data['id'],
           }))
-          setIsTyping(false);
-          setMessageInput('');
-          setFilePreview(null);
+          setIsTyping(false)
+          setMessageInput('')
+          setFilePreview(null)
 
         }
      }
@@ -113,8 +113,8 @@ function PageChats({ selectedChat }) {
         chatSocket.current.send(JSON.stringify({
           'message': messageInput,
         }))
-        setIsTyping(false);
-        setMessageInput('');
+        setIsTyping(false)
+        setMessageInput('')
       }
      }
 
@@ -131,43 +131,43 @@ function PageChats({ selectedChat }) {
 
   useEffect(() => {
     if (selectedChat){
-      // console.log('ФЕТЧИМ ЧАТ ID И СОЗДАЕМ WS');
-      // fetchChatId().then(chat_id => loadWebSocket(chat_id));
+      // console.log('ФЕТЧИМ ЧАТ ID И СОЗДАЕМ WS')
+      // fetchChatId().then(chat_id => loadWebSocket(chat_id))
       setCompanion(selectedChat.companion)
       loadWebSocket(selectedChat.id)
-      console.log('ФЕТЧИМ СООБЩЕНИЯ', selectedChat);
-      fetchMessages().then(messages => setChatMessages(messages));
+      console.log('ФЕТЧИМ СООБЩЕНИЯ', selectedChat)
+      fetchMessages().then(messages => setChatMessages(messages))
     }
-  }, [selectedChat]);
+  }, [selectedChat])
 
 
   useEffect(() => {
     if(chatMessages.length){
       addUnreadTitle('.messages', 'li.unread')
-      scrollToElement('.messages', 'li.unread');
+      scrollToElement('.messages', 'li.unread')
 
     }
-  }, [connected]);
+  }, [connected])
 
   useEffect(() => {
     if (toScrollDown){
-      scrollDown('.messages', true);
-      setToScrollDown(false);
+      scrollDown('.messages', true)
+      setToScrollDown(false)
     }
-  }, [toScrollDown]);
+  }, [toScrollDown])
 
   useEffect(() => {
-    sendTypingStatus();
+    sendTypingStatus()
   }, [isTyping])
 
   function updateTimeout(){
     if (timerId) {
-      clearTimeout(timerId);
+      clearTimeout(timerId)
     }
     let timer = setTimeout(() => {
-      setIsTyping(false);
+      setIsTyping(false)
     }, 2000)
-    setTimerId(timer);
+    setTimerId(timer)
 
   }
   // todo: сохранять только при отправке сообщения
@@ -181,9 +181,9 @@ function PageChats({ selectedChat }) {
             'Content-Type': 'multipart/form-data'
           }
         }
-    );
+    )
     if (response.status === 201){
-      return response.data;
+      return response.data
     }
   }
 
@@ -192,7 +192,7 @@ function PageChats({ selectedChat }) {
     console.log(event.target.files[0])
     setFilePreview(event.target.files[0])
 
-  };
+  }
 
   if (selectedChat && connected){
     return(
@@ -272,4 +272,4 @@ function PageChats({ selectedChat }) {
   }
 }
 
-export default PageChats;
+export default PageChats

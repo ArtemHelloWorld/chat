@@ -1,18 +1,18 @@
-import React, {useEffect, useRef} from 'react';
-import { useInView } from 'react-intersection-observer';
-import timestampToTimezone from '../../../utils/timestampToTimezone.js';
-import {BiCheckDouble, BiCheck} from 'react-icons/bi';
+import React, {useEffect, useRef} from 'react'
+import { useInView } from 'react-intersection-observer'
+import timestampToTimezone from '../../../utils/timestampToTimezone.js'
+import {BiCheckDouble, BiCheck} from 'react-icons/bi'
 
 
 function ChatRoomMessage({ message, onMessageRead, position }) {
-  const listItemRef = useRef();
-  const [inViewRef, inView] = useInView();
+  const listItemRef = useRef()
+  const [inViewRef, inView] = useInView()
 
   const sendingTimezone = timestampToTimezone(message.sending_timestamp)
 
   useEffect(() => {
     if (position === 'left' && inView && !message.is_read){
-      onMessageRead(message);
+      onMessageRead(message)
     }
   }, [inView])
 
@@ -77,7 +77,7 @@ function ChatRoomMessage({ message, onMessageRead, position }) {
         </li>
       }
     </>
-  );
+  )
 }
 
-export default ChatRoomMessage;
+export default ChatRoomMessage

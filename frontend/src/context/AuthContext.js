@@ -1,19 +1,19 @@
-import React, {createContext, useState, useEffect} from 'react';
-import jwt_decode from "jwt-decode";
-import {useNavigate} from "react-router-dom";
+import React, {createContext, useState, useEffect} from 'react'
+import jwt_decode from "jwt-decode"
+import {useNavigate} from "react-router-dom"
 
 
-const AuthContext = createContext(undefined);
-export default AuthContext;
+const AuthContext = createContext(undefined)
+export default AuthContext
 
 
 export const AuthProvider = ({children}) => {
-    let navigate = useNavigate();
-    let [accessToken, setAccessToken] = useState(() => localStorage.getItem('accessToken'));
-    let [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refreshToken'));
-    let [user, setUser] = useState(() => localStorage.getItem('accessToken') ? jwt_decode(localStorage.getItem('accessToken')) : null);
+    let navigate = useNavigate()
+    let [accessToken, setAccessToken] = useState(() => localStorage.getItem('accessToken'))
+    let [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refreshToken'))
+    let [user, setUser] = useState(() => localStorage.getItem('accessToken') ? jwt_decode(localStorage.getItem('accessToken')) : null)
     
-    let [loading, setLoading] = useState(true);
+    let [loading, setLoading] = useState(true)
 
 
     const loginUser = async (username, password) =>  {
@@ -26,18 +26,18 @@ export const AuthProvider = ({children}) => {
             'Content-Type': 'application/json',
             },
           body: JSON.stringify({'username': username, 'password': password})
-        });
+        })
 
-        let response_status = response.status;
-        let response_data = await response.json();
+        let response_status = response.status
+        let response_data = await response.json()
 
         if (response_status === 200){
-            setAccessToken(response_data.access);
-            setRefreshToken(response_data.refresh);
-            setUser(jwt_decode(response_data.access));
+            setAccessToken(response_data.access)
+            setRefreshToken(response_data.refresh)
+            setUser(jwt_decode(response_data.access))
 
-            localStorage.setItem('accessToken', response_data.access);
-            localStorage.setItem('refreshToken', response_data.refresh);
+            localStorage.setItem('accessToken', response_data.access)
+            localStorage.setItem('refreshToken', response_data.refresh)
         }
         return [response_status, response_data]
     }
@@ -53,24 +53,24 @@ export const AuthProvider = ({children}) => {
                 },
             body: JSON.stringify({'username': username, 'password': password})
             }
-        );
-        let response_status = response.status;
-        let response_data = await response.json();
+        )
+        let response_status = response.status
+        let response_data = await response.json()
 
-        return [response_status, response_data];
+        return [response_status, response_data]
       }
 
     
 
     let logoutUser = () => {
-        setAccessToken(null);
-        setRefreshToken(null);
-        setUser(null);
+        setAccessToken(null)
+        setRefreshToken(null)
+        setUser(null)
 
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        console.log('navigate');
-        navigate('/login');
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+        console.log('navigate')
+        navigate('/login')
     }
 
 
@@ -84,39 +84,39 @@ export const AuthProvider = ({children}) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({'refresh': refreshToken})
-            });
+            })
             
-            let data = await response.json();
-            console.log(data);
+            let data = await response.json()
+            console.log(data)
             if (response.status === 200){
-                setAccessToken(data.access);
-                setUser(jwt_decode(data.access));
+                setAccessToken(data.access)
+                setUser(jwt_decode(data.access))
 
-                localStorage.setItem('accessToken', accessToken);
+                localStorage.setItem('accessToken', accessToken)
             }
             else {
-                logoutUser();
+                logoutUser()
             }
         }
-        setLoading(false);
+        setLoading(false)
     }
    
 
     // not the best practice
     useEffect(() => {
         if(loading){
-            updateToken();
+            updateToken()
         }
 
         let fourMinutes = 4 * 60 * 1000
 
         let interval =  setInterval(()=> {
             if (refreshToken){
-                updateToken();
+                updateToken()
             }
             
-        }, fourMinutes);
-        return ()=> clearInterval(interval);
+        }, fourMinutes)
+        return ()=> clearInterval(interval)
 
     }, [accessToken, loading])
 

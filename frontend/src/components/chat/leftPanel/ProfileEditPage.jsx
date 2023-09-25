@@ -1,31 +1,31 @@
-import React, {useContext, useState, useEffect} from 'react';
-import useAxios from '../../../utils/useAxios';
-import AuthContext from '../../../context/AuthContext';
-import {MdOutlineAddAPhoto} from 'react-icons/md';
+import React, {useContext, useState, useEffect} from 'react'
+import useAxios from '../../../utils/useAxios'
+import AuthContext from '../../../context/AuthContext'
+import {MdOutlineAddAPhoto} from 'react-icons/md'
 
 
 function ProfileEditPage({setActivePanel}) {
-  const api = useAxios();
-  const {user} = useContext(AuthContext);
-  const [profile, setProfile] = useState(null);
-  const [newPhotoUploaded, setNewPhotoUploaded] = useState(false);
-  const [formData, setFormData] = useState({});
-  const [formError, setFormError] = useState('');
+  const api = useAxios()
+  const {user} = useContext(AuthContext)
+  const [profile, setProfile] = useState(null)
+  const [newPhotoUploaded, setNewPhotoUploaded] = useState(false)
+  const [formData, setFormData] = useState({})
+  const [formError, setFormError] = useState('')
 
   async function fetchProfile() {
-    let response = await api.get(`api/v1/profile/${user.user_id}/`);
+    let response = await api.get(`api/v1/profile/${user.user_id}/`)
     if (response.status === 200){
-      return response.data;
+      return response.data
     }
   }
 
   const handleChange = event => {
-      const { name, value } = event.target;
+      const { name, value } = event.target
       setFormData({
           ...formData,
           [name]: value,
-      });
-  };
+      })
+  }
 
   const handlePhotoChange = event => {
     console.log(event.target.files[0])
@@ -33,15 +33,15 @@ function ProfileEditPage({setActivePanel}) {
     setFormData({
         ...formData,
         profile_image: event.target.files[0],
-    });
+    })
     setNewPhotoUploaded(true)
-  };
+  }
   const handleSubmit = event => {
-    event.preventDefault();
-    const formDataToSend = new FormData();
+    event.preventDefault()
+    const formDataToSend = new FormData()
     for (const key in formData) {
         if (formData[key] !== profile[key]){
-          formDataToSend.append(key, formData[key]);
+          formDataToSend.append(key, formData[key])
         }
     }
 
@@ -50,17 +50,17 @@ function ProfileEditPage({setActivePanel}) {
         setActivePanel('profile')
       })
       .catch(error => {
-        setFormError(error.toString());
-      });
-  };
+        setFormError(error.toString())
+      })
+  }
 
 
   useEffect(() => {
     fetchProfile().then(response => {
-      setProfile(response);
-      setFormData(response);
+      setProfile(response)
+      setFormData(response)
     })
-    ;
+    
   }, [])
 
 
@@ -96,7 +96,7 @@ function ProfileEditPage({setActivePanel}) {
                 <button className="btn purple-bg mx-3 my-1" type="submit">Сохранить изменения</button>
             </form>
         </div>
-    );
+    )
   }
   else {
     return (
@@ -106,4 +106,4 @@ function ProfileEditPage({setActivePanel}) {
   }
 }
 
-export default ProfileEditPage;
+export default ProfileEditPage

@@ -1,17 +1,17 @@
-import React, {useContext, useState, useEffect} from 'react';
-import useAxios from '../../../utils/useAxios';
-import AuthContext from '../../../context/AuthContext';
+import React, {useContext, useState, useEffect} from 'react'
+import useAxios from '../../../utils/useAxios'
+import AuthContext from '../../../context/AuthContext'
 
 function ProfilePage() {
-  const api = useAxios();
-  const {user} = useContext(AuthContext);
-  const [profile, setProfile] = useState(null);
+  const api = useAxios()
+  const {user} = useContext(AuthContext)
+  const [profile, setProfile] = useState(null)
 
 
   async function fetchProfile() {
-    let response = await api.get(`api/v1/profile/${user.user_id}/`);
+    let response = await api.get(`api/v1/profile/${user.user_id}/`)
     if (response.status === 200){
-      return response.data;
+      return response.data
     }
   }
 
@@ -27,10 +27,10 @@ function ProfilePage() {
   useEffect(() => {
     fetchProfile().then(response => {
 
-      setProfile(response);
+      setProfile(response)
       console.log(response)
     })
-    ;
+    
   }, [])
 
 
@@ -56,11 +56,11 @@ function ProfilePage() {
           {profile.last_name && wrapIntoBox("Last name", profile.last_name)}
           {profile.bio && wrapIntoBox("Bio", profile.bio)}
         </div>
-    );
+    )
   }
   else {
     return (<></>)
   }
 }
 
-export default ProfilePage;
+export default ProfilePage
