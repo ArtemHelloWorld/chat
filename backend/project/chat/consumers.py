@@ -137,7 +137,7 @@ class HandlersMixin:
 
     def chat_message(self, event):
         data = {
-            'type': 'chat',
+            'type': 'chat_message',
             'id': event.get('pk'),
             'text': event.get('text'),
             'file': event.get('file'),
@@ -170,7 +170,9 @@ class HandlersMixin:
 
 
 class ChatConsumer(
-    ReceiversMixin, HandlersMixin, channels.generic.websocket.WebsocketConsumer
+    channels.generic.websocket.WebsocketConsumer,
+    ReceiversMixin,
+    HandlersMixin,
 ):
     def connect(self):
         print('connected')
@@ -208,13 +210,13 @@ class ChatConsumer(
         elif 'mark_message_as_read' in data_json:
             self.mark_message_as_read_receiver(data_json)
 
-    def _group_send_i_am_here(self, os_online: bool):
+    def _group_send_i_am_here(self, is_online: bool):
         asgiref.sync.async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
             {
                 'type': 'i_am_here',
                 'sender': self.scope['user'].id,
-                'is_online': os_online,
+                'is_online': is_online,
             },
         )
 
@@ -226,3 +228,4 @@ class ChatConsumer(
                 'sender': self.scope['user'].id,
             },
         )
+        print('_grop_send_who_is_here')

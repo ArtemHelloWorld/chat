@@ -54,10 +54,11 @@ function PageChats({ selectedChat }) {
     chatSocket.current.onmessage = (event) => {
       const data = JSON.parse(event.data)
       console.log(data)
-      if(data.type === 'chat'){
-        console.log('onmessage', event.data)
-        setChatMessages(prev => [...prev, data])
-        setToScrollDown(true)
+      
+      if(data.type === 'chat_message'){
+        console.log('chat_message', event.data)
+        setChatMessages(prev => [...prev, data]);
+        setToScrollDown(true);
       }
       else if (data.type === 'i_am_here') {
         if (data.sender === selectedChat.companion.id) {
