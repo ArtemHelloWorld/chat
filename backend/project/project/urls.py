@@ -65,7 +65,6 @@ urlpatterns = [
     ),
     django.urls.path(
         'api/v1/message/file/upload/',
-
         chat.views.MessageFileCreateAPIView.as_view(),
         name='message-file-create',
     ),
