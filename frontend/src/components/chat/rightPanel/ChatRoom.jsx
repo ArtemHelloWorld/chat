@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef, useContext }  from 'react'
-import { scrollToElement, scrollDown } from '../../../utils/ScrollDown'
-import AuthContext from '../../../context/AuthContext'
-import useAxios from '../../../utils/useAxios'
-import ChatRoomMessage from './ChatRoomMessage.jsx'
-import addUnreadTitle from '../../../utils/addUnreadTitle'
-import {VscSend} from 'react-icons/vsc'
-import {MdOutlineAddAPhoto} from 'react-icons/md'
+import React, {useContext, useEffect, useRef, useState} from "react"
+import {scrollDown, scrollToElement} from "../../../utils/ScrollDown"
+import AuthContext from "../../../context/AuthContext"
+import useAxios from "../../../utils/useAxios"
+import ChatRoomMessage from "./ChatRoomMessage.jsx"
+import addUnreadTitle from "../../../utils/addUnreadTitle"
+import {VscSend} from "react-icons/vsc"
+import {MdOutlineAddAPhoto} from "react-icons/md"
 
 function PageChats({ selectedChat }) {
   const chatSocket = useRef()
@@ -17,7 +17,7 @@ function PageChats({ selectedChat }) {
   const [companion, setCompanion] = useState({})
   const [isCompanionTyping, setIsCompanionTyping] = useState(false)
 
-  const [messageInput, setMessageInput] = useState('')
+  const [messageInput, setMessageInput] = useState("")
   const [chatMessages, setChatMessages] = useState([])
   const [filePreview, setFilePreview] = useState(null)
   const {user, accessToken} = useContext(AuthContext)
@@ -26,14 +26,14 @@ function PageChats({ selectedChat }) {
 
 
   async function fetchMessages() {
-    let response = await api.get(`api/v1/chat/${selectedChat.id}/messages/`)
+    const response = await api.get(`api/v1/chat/${selectedChat.id}/messages/`)
     if (response.status === 200){
       return response.data
     }
   }
 
   function newWebSocket(chat_id){
-    let url = `ws://localhost:8000/ws/socket-server/chat/${accessToken}/${chat_id}/`
+    const url = `ws://localhost:8000/ws/socket-server/chat/${accessToken}/${chat_id}/`
 
     if (chatSocket.current) {
       if (chatSocket.current.url !== url) {
@@ -48,62 +48,60 @@ function PageChats({ selectedChat }) {
 
     chatSocket.current.onopen = () => {
       setConnected(true)
-      console.log('Socket connected', connected)
+      console.log("Socket connected", connected)
     }
 
     chatSocket.current.onmessage = (event) => {
       const data = JSON.parse(event.data)
       console.log(data)
       
-      if(data.type === 'chat_message'){
-        console.log('chat_message', event.data)
+      if(data.type === "chat_message"){
         setChatMessages(prev => [...prev, data]);
         setToScrollDown(true);
       }
-      else if (data.type === 'i_am_here') {
+      else if (data.type === "i_am_here") {
         if (data.sender === selectedChat.companion.id) {
           selectedChat.companion = {...selectedChat.companion, is_online: data.is_online}
           setCompanion(selectedChat.companion)
         }
       }
-      else if (data.type === 'user_typing'){
+      else if (data.type === "user_typing"){
         if (data.sender === selectedChat.companion.id){
           setIsCompanionTyping(data.typing)
         }
       }
-      else if (data.type === 'mark_message_as_read'){
+      else if (data.type === "mark_message_as_read"){
         setChatMessages(prev => [...prev.map(message => message.id===data.message_pk ? {...message, is_read: true}: {...message})])
       }
     }
     chatSocket.current.onclose = (event) => {
       setConnected(false)
-      console.log('Socket clost')
+      console.log("Socket clost")
     }
     chatSocket.current.onerror = (event) => {
-      console.log('Socket error')
+      console.log("Socket error")
     }
   }
 
-  const sendTypingStatus = async () => {
+  async function sendTypingStatus(){
     if (connected){
       chatSocket.current.send(JSON.stringify({
-        'typing': isTyping,
+        "typing": isTyping,
       }))
     }
   }
 
-   const sendInputData = async () => {
-     console.log(filePreview, 'filepreview')
+   async function sendInputData(){
      if (filePreview){
         const file_data = await uploadMessageFile(filePreview)
-        console.log(file_data, 'file_data')
+        console.log(file_data, "file_data")
         if (file_data){
           chatSocket.current.send(JSON.stringify({
-            'message': messageInput,
-            'file_id': file_data['id'],
+            "message": messageInput,
+            "file_id": file_data["id"],
           }))
           setIsTyping(false)
-          setMessageInput('')
+          setMessageInput("")
           setFilePreview(null)
 
         }
@@ -112,19 +110,19 @@ function PageChats({ selectedChat }) {
      else {
        if(connected && messageInput ){
         chatSocket.current.send(JSON.stringify({
-          'message': messageInput,
+          "message": messageInput,
         }))
         setIsTyping(false)
-        setMessageInput('')
+        setMessageInput("")
       }
      }
 
 
   }
-  const markMessageAsRead = async (message) => {
+  async function markMessageAsRead(message){
     if(connected){
       chatSocket.current.send(JSON.stringify({
-        'mark_message_as_read': message.id,
+        "mark_message_as_read": message.id,
       }))
     }
   }
@@ -132,11 +130,9 @@ function PageChats({ selectedChat }) {
 
   useEffect(() => {
     if (selectedChat){
-      // console.log('ФЕТЧИМ ЧАТ ID И СОЗДАЕМ WS')
-      // fetchChatId().then(chat_id => loadWebSocket(chat_id))
       setCompanion(selectedChat.companion)
       loadWebSocket(selectedChat.id)
-      console.log('ФЕТЧИМ СООБЩЕНИЯ', selectedChat)
+      console.log("ФЕТЧИМ СООБЩЕНИЯ", selectedChat)
       fetchMessages().then(messages => setChatMessages(messages))
     }
   }, [selectedChat])
@@ -144,15 +140,15 @@ function PageChats({ selectedChat }) {
 
   useEffect(() => {
     if(chatMessages.length){
-      addUnreadTitle('.messages', 'li.unread')
-      scrollToElement('.messages', 'li.unread')
+      addUnreadTitle(".messages", "li.unread")
+      scrollToElement(".messages", "li.unread")
 
     }
   }, [connected])
 
   useEffect(() => {
     if (toScrollDown){
-      scrollDown('.messages', true)
+      scrollDown(".messages", true)
       setToScrollDown(false)
     }
   }, [toScrollDown])
@@ -165,7 +161,7 @@ function PageChats({ selectedChat }) {
     if (timerId) {
       clearTimeout(timerId)
     }
-    let timer = setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsTyping(false)
     }, 2000)
     setTimerId(timer)
@@ -174,12 +170,12 @@ function PageChats({ selectedChat }) {
   // todo: сохранять только при отправке сообщения
   const uploadMessageFile = async (image) => {
     console.log(image)
-    let response = await api.post(`api/v1/message/file/upload/`, {
-      'image': image
+    const response = await api.post(`api/v1/message/file/upload/`, {
+      "image": image
     },
         {
           headers: {
-            'Content-Type': 'multipart/form-data'
+            "Content-Type": "multipart/form-data"
           }
         }
     )
@@ -201,44 +197,43 @@ function PageChats({ selectedChat }) {
         <div className="room-header black-light-bg mx-1 d-flex flex-row align-items-center px-5">
           <img
             src={
-              companion.profile_image.indexOf('http') === -1
-                ? 'http://127.0.0.1:8000' + companion.profile_image
+              companion.profile_image.indexOf("http") === -1
+                ? "http://127.0.0.1:8000" + companion.profile_image
                 : companion.profile_image
             }
             alt=""
             className="img-fluid rounded-circle"
-            style={{ height: '4rem', width: '4rem' }}
+            style={{ height: "4rem", width: "4rem" }}
           />
           <div className="mx-3">
             <h1 className="p-0 m-0">{companion.username}</h1>
-            <div><small>{isCompanionTyping ? 'Печатает...' : (companion.is_online ? 'Онлайн' : `Был(a) недавно`)}</small></div>
+            <div><small>{isCompanionTyping ? "Печатает..." : (companion.is_online ? "Онлайн" : `Был(a) недавно`)}</small></div>
           </div>
         </div>
 
         <div className="messages flex-grow-1 overflow-auto mb-3 px-5">
           <ul className="message-list list-unstyled d-flex flex-column gap-2 my-3 px-5">
             {chatMessages.map((message, index) => (
-                <>
-                  <ChatRoomMessage
-                    key={message.id}
-                    message={message}
-                    onMessageRead={markMessageAsRead}
-                    position={message.sender === user.user_id ? 'right': 'left'}
-                  />
-                </>
+              <>
+                <ChatRoomMessage
+                  key={message.id}
+                  message={message}
+                  onMessageRead={markMessageAsRead}
+                  position={message.sender === user.user_id ? "right": "left"}
+                />
+              </>
             ))}
           </ul>
         </div>
 
         <div className="container">
-        { filePreview &&
-                <img
-                  src={URL.createObjectURL(filePreview)}
-                  className="img-fluid mh-100 w-auto p-3 pb-1" alt=""
-                />
-            }
+          { filePreview &&
+            <img
+              src={URL.createObjectURL(filePreview)}
+              className="img-fluid mh-100 w-auto p-3 pb-1" alt=""
+            />
+          }
           <div id="message-form" className="input-group input-group-lg mx-auto mb-3 justify-content-end w-50" >
-
             <div>
               <label
                   onChange={handlePhotoChange}
@@ -254,9 +249,9 @@ function PageChats({ selectedChat }) {
               className="form-control shadow-none border-dark black-light-bg rounded-pill rounded-end"
               placeholder="Cообщение..."
               value={messageInput}
-              onChange={event => {setMessageInput(event.target.value); setIsTyping(true); updateTimeout(); console.log('typing...')}}
-              onBlur={event => {setIsTyping(false); console.log('not typing')}}
-              onKeyDown={(event) => {event.key === 'Enter' && sendInputData()}}
+              onChange={event => {setMessageInput(event.target.value); setIsTyping(true); updateTimeout(); console.log("typing...")}}
+              onBlur={event => {setIsTyping(false); console.log("not typing")}}
+              onKeyDown={(event) => {event.key === "Enter" && sendInputData()}}
               >
             </input>
             <button onClick={sendInputData} className="btn purple-bg rounded-pill rounded-start align-self-center"><VscSend size="1.75rem"/></button>
@@ -266,10 +261,7 @@ function PageChats({ selectedChat }) {
     )
   }
   else{
-    return (
-      <>
-      </>
-      )
+    return <></>
   }
 }
 

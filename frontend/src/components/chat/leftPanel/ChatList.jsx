@@ -73,8 +73,8 @@ function ChatList({ selectedChat, setSelectedChat }){
   }
   function getLastMessageDate(chat){
     if (chat.last_message_info){
-      const localTime = timestampToTimezone(chat.last_message_info.sending_timestamp)
-      return localTime.toFormat("HH:mm")
+      const sendingTime = timestampToTimezone(chat.last_message_info.sending_timestamp)
+      return sendingTime.toFormat("HH:mm")
     }
   }
 
