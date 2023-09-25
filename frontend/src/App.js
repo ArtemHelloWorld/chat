@@ -1,17 +1,16 @@
-import React  from 'react'
-import 'bootstrap/dist/css/bootstrap.css';
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import React from "react"
+import "bootstrap/dist/css/bootstrap.css"
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom"
 
-import {AuthProvider} from './context/AuthContext.js'
-import PrivateRoute from "./utils/PrivateRoute.js";
+import {AuthProvider} from "./context/AuthContext.js"
+import PrivateRoute from "./utils/PrivateRoute.js"
 
-import ChatApp from './components/chat/ChatApp.jsx';
-import LoginPage from "./components/auth/LoginPage.jsx";
-import SignUpPage from "./components/auth/SignUpPage.jsx";
+import ChatApp from "./components/chat/ChatApp.jsx"
+import LoginPage from "./components/auth/LoginPage.jsx"
+import SignUpPage from "./components/auth/SignUpPage.jsx"
 
 
 function App() {
-
   return (
     <Router>
       <AuthProvider>
@@ -22,8 +21,7 @@ function App() {
         </Routes>
       </AuthProvider>
     </Router>
-  );
-
+  )
 }
 
-export default App;
+export default App

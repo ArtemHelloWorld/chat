@@ -1,26 +1,25 @@
-import React, { useState } from 'react';
-import useAxios from '../../utils/useAxios';
+import React, {useState} from "react"
+import useAxios from "../../utils/useAxios"
 
-import LeftPanel from './leftPanel/LeftPanel.jsx';
-import ChatRoom from './rightPanel/ChatRoom.jsx';
+import LeftPanel from "./leftPanel/LeftPanel.jsx"
+import ChatRoom from "./rightPanel/ChatRoom.jsx"
 
 async function fetchChat(username) {
-    const api = useAxios();
-    let response = await api.get(`api/v1/chat/user/${username}/`);
+    const api = useAxios()
+    const response = await api.get(`api/v1/chat/user/${username}/`)
       if (response.status === 200){
-        return response.data;
+        return response.data
       }
   }
 
   
-const ChatPage = () => {
-    const [selectedChat, setSelectedChat] = useState(null);
+function ChatPage(){
+    const [selectedChat, setSelectedChat] = useState(null)
 
     if (!selectedChat && window.location.hash){
-        let username = window.location.hash.replace('#', '');
+        const username = window.location.hash.replace("#", "")
         fetchChat(username).then(chat => setSelectedChat(chat))
     }
-
 
     return (
         <div className="container-fluid h-100">
@@ -33,8 +32,8 @@ const ChatPage = () => {
                 </div>
             </div>
         </div>
-    );
+    )
 }
 
-export default ChatPage;
+export default ChatPage
 
