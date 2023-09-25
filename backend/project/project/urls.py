@@ -1,10 +1,20 @@
 import django.conf.urls.static
 import django.contrib.admin
 import django.urls
+import drf_yasg.openapi
+import drf_yasg.views
+import rest_framework.permissions
 import rest_framework_simplejwt.views
 
 import chat.views
 import users.views
+
+schema_view = drf_yasg.views.get_schema_view(
+    drf_yasg.openapi.Info(title='openApi', default_version='v1'),
+    public=True,
+    permission_classes=[rest_framework.permissions.AllowAny],
+)
+
 
 urlpatterns = [
     django.urls.path(
@@ -55,11 +65,18 @@ urlpatterns = [
     ),
     django.urls.path(
         'api/v1/message/file/upload/',
+
         chat.views.MessageFileCreateAPIView.as_view(),
         name='message-file-create',
     ),
     django.urls.path('admin/', django.contrib.admin.site.urls),
     django.urls.path('api-auth/', django.urls.include('rest_framework.urls')),
+    django.urls.path(
+        'api/v1/docs/swagger/', schema_view.with_ui('swagger', cache_timeout=0)
+    ),
+    django.urls.path(
+        'api/v1/docs/redoc/', schema_view.with_ui('redoc', cache_timeout=0)
+    ),
 ]
 
 urlpatterns += django.conf.urls.static.static(

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',
     'core.apps.CoreConfig',
     'users.apps.UsersConfig',
+    'drf_yasg',
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -228,3 +229,8 @@ AUTH_PASSWORD_VALIDATORS = [
         ),
     },
 ]
+
+SWAGGER_SETTINGS = {
+    'LOGIN_URL': '/api-auth/login/',
+    'LOGOUT_URL': '/api-auth/logout/',
+}

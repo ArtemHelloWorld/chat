@@ -26,6 +26,7 @@ def get_chat_or_create(user, companion):
             .order_by('-created_timestamp')
         )
         return chat_list[0]
+
     return chat_obj
 
 

@@ -211,6 +211,7 @@ class ChatConsumer(
             self.mark_message_as_read_receiver(data_json)
 
     def _group_send_i_am_here(self, is_online: bool):
+
         asgiref.sync.async_to_sync(self.channel_layer.group_send)(
             self.chat_group_name,
             {
