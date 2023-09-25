@@ -18,7 +18,7 @@ function LoginPage() {
     setUsernameError('')
     setPasswordErrors([])
   }
-  const handleLoginSubmit = (event) => {
+  const handleLoginSubmit = async (event) => {
     event.preventDefault()
 
     let username = event.target.username.value
@@ -33,16 +33,14 @@ function LoginPage() {
       setPasswordErrors(['Введите пароль'])
     }
     else {
-      loginUser(username, password).then(([response_status, response_data]) => {
-          if (response_status === 200) {
-            navigate('/')
-          } else {
-            setFormError(response_data['detail'])
-            setUsernameError(response_data['username'])
-            setPasswordErrors(response_data['password'])
-          }
-        }
-      )
+      const [response_status, response_data] = await loginUser(username, password)
+      if (response_status === 200) {
+        navigate('/')
+      } else {
+        setFormError(response_data['detail'])
+        setUsernameError(response_data['username'])
+        setPasswordErrors(response_data['password'])
+      }
     }
   }
   

@@ -1,4 +1,4 @@
-import React, {createContext, useState, useEffect} from 'react'
+import React, {createContext, useEffect, useState} from 'react'
 import jwt_decode from "jwt-decode"
 import {useNavigate} from "react-router-dom"
 
@@ -8,28 +8,27 @@ export default AuthContext
 
 
 export const AuthProvider = ({children}) => {
-    let navigate = useNavigate()
-    let [accessToken, setAccessToken] = useState(() => localStorage.getItem('accessToken'))
-    let [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refreshToken'))
-    let [user, setUser] = useState(() => localStorage.getItem('accessToken') ? jwt_decode(localStorage.getItem('accessToken')) : null)
+    const navigate = useNavigate()
+    const [accessToken, setAccessToken] = useState(() => localStorage.getItem('accessToken'))
+    const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem('refreshToken'))
+    const [user, setUser] = useState(() => localStorage.getItem('accessToken') ? jwt_decode(localStorage.getItem('accessToken')) : null)
     
-    let [loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true)
 
 
-    const loginUser = async (username, password) =>  {
+    async function loginUser(username, password){
+        const response =  await fetch('http://localhost:8000/api/v1/token/',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                },
+              body: JSON.stringify({'username': username, 'password': password})
+            }
+        )
 
-
-        let response =  await fetch('http://localhost:8000/api/v1/token/',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            },
-          body: JSON.stringify({'username': username, 'password': password})
-        })
-
-        let response_status = response.status
-        let response_data = await response.json()
+        const response_status = response.status
+        const response_data = await response.json()
 
         if (response_status === 200){
             setAccessToken(response_data.access)
@@ -44,7 +43,7 @@ export const AuthProvider = ({children}) => {
 
 
 
-    const signUpUser = async (username, password) =>  {
+    async function signUpUser(username, password){
         let response =  await fetch('http://localhost:8000/api/v1/user/signup/',
             {
             method: 'POST',
@@ -62,19 +61,18 @@ export const AuthProvider = ({children}) => {
 
     
 
-    let logoutUser = () => {
+    function logoutUser(){
         setAccessToken(null)
         setRefreshToken(null)
         setUser(null)
 
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
-        console.log('navigate')
         navigate('/login')
     }
 
 
-    let updateToken = async () => {
+    async function updateToken(){
         console.log('Update token')
         if (refreshToken){
             let response =  await fetch('http://localhost:8000/api/v1/token/refresh/',
@@ -87,11 +85,9 @@ export const AuthProvider = ({children}) => {
             })
             
             let data = await response.json()
-            console.log(data)
             if (response.status === 200){
                 setAccessToken(data.access)
                 setUser(jwt_decode(data.access))
-
                 localStorage.setItem('accessToken', accessToken)
             }
             else {
@@ -108,20 +104,19 @@ export const AuthProvider = ({children}) => {
             updateToken()
         }
 
-        let fourMinutes = 4 * 60 * 1000
-
-        let interval =  setInterval(()=> {
+        const fourMinutes = 4 * 60 * 1000
+        const interval = setInterval(()=> {
             if (refreshToken){
                 updateToken()
             }
-            
+
         }, fourMinutes)
         return ()=> clearInterval(interval)
 
     }, [accessToken, loading])
 
 
-    let contextData = {
+    const contextData = {
         user: user,
         accessToken: accessToken,
         loginUser: loginUser,
