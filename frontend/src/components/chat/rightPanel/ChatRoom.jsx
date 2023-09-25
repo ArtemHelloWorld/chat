@@ -54,8 +54,8 @@ function PageChats({ selectedChat }) {
     chatSocket.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
       console.log(data)
-      if(data.type === 'chat'){
-        console.log('onmessage', event.data)
+      if(data.type === 'chat_message'){
+        console.log('chat_message', event.data)
         setChatMessages(prev => [...prev, data]);
         setToScrollDown(true);
       }

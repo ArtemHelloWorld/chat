@@ -137,7 +137,7 @@ class HandlersMixin:
 
     def chat_message(self, event):
         data = {
-            'type': 'chat',
+            'type': 'chat_message',
             'id': event.get('pk'),
             'text': event.get('text'),
             'file': event.get('file'),
