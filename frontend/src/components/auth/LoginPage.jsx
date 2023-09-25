@@ -9,24 +9,41 @@ function LoginPage() {
   let navigate = useNavigate();
   const {loginUser} = useContext(AuthContext);
 
-  const [formError, setformError] = useState('');
+  const [formError, setFormError] = useState('');
   const [usernameError, setUsernameError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  
+  const [passwordErrors, setPasswordErrors] = useState([]);
 
+  function clearErrors() {
+    setFormError('');
+    setUsernameError('');
+    setPasswordErrors([]);
+  }
   const handleLoginSubmit = (event) => {
     event.preventDefault();
 
-    loginUser(event).then(response => {
-      if (response === 200){
-        navigate('/');
-      }
-      else{
-        setformError(response['detail'])
-        setUsernameError(response['username'])
-        setPasswordError(response['password'])
-      }
-    });
+    let username = event.target.username.value
+    let password = event.target.password.value
+
+    clearErrors()
+
+    if (!username.length){
+      setUsernameError('Введите логин')
+    }
+    else if (!password.length){
+      setPasswordErrors(['Введите пароль'])
+    }
+    else {
+      loginUser(username, password).then(([response_status, response_data]) => {
+          if (response_status === 200) {
+            navigate('/')
+          } else {
+            setFormError(response_data['detail'])
+            setUsernameError(response_data['username'])
+            setPasswordErrors(response_data['password'])
+          }
+        }
+      );
+    }
   };
   
   return (
@@ -46,8 +63,19 @@ function LoginPage() {
                 placeholder="Логин"
                 className="form-control form-control-lg"
               />
-              </div>
-          <p id='password_error'>{passwordError}</p>
+          </div>
+          {
+            passwordErrors &&
+            <ul id='password_errors' className='list-unstyled'>
+              {
+                passwordErrors.map((error, index) =>
+                  <li key={index}>
+                    {error}
+                  </li>
+                )
+              }
+            </ul>
+          }
           <div className="form-outline form-white mb-4">
               <input
                 type="password"
@@ -59,7 +87,6 @@ function LoginPage() {
           <button type="submit" className="btn btn-primary btn-lg px-5 mb-5">Войти</button>
         </form>
         <div>
-          {/* <p className="small mb-5 pb-lg-2"><a className="text-white-50" href="/password_reset">Забыли пароль?</a></p> */}
           <p className="mb-0">Ещё нет аккаунта? <a href="/signup" className="text-white-50 fw-bold">Регистрация</a></p>
         </div>
       </div>

@@ -1,5 +1,4 @@
 import React, {useContext, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 
 import AuthContext from '../../context/AuthContext.js';
 import AuthLayout from './AuthLayout.jsx';
@@ -7,16 +6,20 @@ import AuthLayout from './AuthLayout.jsx';
 
 
 function SignUpPage() {
-  let navigate = useNavigate();
   const {signUpUser} = useContext(AuthContext);
 
   const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-  const [formError, setformError] = useState('');
+  const [formError, setFormError] = useState('');
   const [usernameError, setUsernameError] = useState('');
-  const [passwordError, setPasswordError] = useState([]);
+  const [passwordErrors, setPasswordErrors] = useState([]);
 
+  function clearErrors() {
+    setFormError('');
+    setUsernameError('');
+    setPasswordErrors([]);
 
+  }
   const handleSignUpUser = (event) => {
     event.preventDefault();
 
@@ -24,31 +27,31 @@ function SignUpPage() {
     let password = event.target.password.value;
     let passwordRepeat = event.target.passwordRepeat.value;
 
+    clearErrors()
+
     if (!username.length) {
           setUsernameError('Придумайте логин');
     }
     else if (!password.length) {
-        setPasswordError('Придумайте пароль');
+        setPasswordErrors(['Придумайте пароль']);
     }
 
     else if (passwordRepeat !== password) {
-        setPasswordError('Пароли не совпадают');
+        setPasswordErrors(['Пароли не совпадают']);
     }
 
     else {
-      signUpUser(username, password).then(response => {
-      if (response === 200){
-        setSignUpSuccess(true)
-      }
-      else{
-        setformError(response['detail'])
-        setUsernameError(response['username'])
-        setPasswordError(response['password'])
-      }
-    });
+      signUpUser(username, password).then(([response_status, response_data]) => {
+        if (response_status === 200){
+          setSignUpSuccess(true)
+        }
+        else{
+          setFormError(response_data['detail'])
+          setUsernameError(response_data['username'])
+          setPasswordErrors(response_data['password'])
+        }
+      });
     }
-
-
   }
 
   if (!signUpSuccess){
@@ -61,7 +64,7 @@ function SignUpPage() {
       <div>
         <p id='form_error'>{formError}</p>
         <form onSubmit={handleSignUpUser}>
-          <p id='username_error'>{usernameError}</p>
+          <p id='username_errors'>{usernameError}</p>
           <div className="form-outline form-white mb-4">
             <input
                 type="text"
@@ -70,14 +73,18 @@ function SignUpPage() {
                 className="form-control form-control-lg"
               />
           </div>
-          <ul id='password_error'>
-            {passwordError.map((error, index) =>
-                <li key={index}>
-                  {error}
-                </li>
-              )
-            }
-          </ul>
+          {
+            passwordErrors &&
+            <ul id='password_errors' className='list-unstyled'>
+              {passwordErrors.map((error, index) =>
+                  <li key={index}>
+                    {error}
+                  </li>
+                )
+              }
+            </ul>
+          }
+
           <div className="form-outline form-white mb-4">
             <input
               type="password"
@@ -97,7 +104,6 @@ function SignUpPage() {
           <button type="submit" className="btn btn-primary btn-lg px-5 mb-5">Зарегистрироваться</button>
         </form>
         <div>
-          {/* <p className="small mb-5 pb-lg-2"><a className="text-white-50" href="/password_reset">Забыли пароль?</a></p> */}
           <p className="mb-0">Уже есть аккаунт? <a href="/login" className="text-white-50 fw-bold">Войти</a></p>
         </div>
       </div>

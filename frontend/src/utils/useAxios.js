@@ -53,7 +53,7 @@ const useAxios = () => {
     //         if (error.response.status === 401 && !originalRequest._retry) {
     //           originalRequest._retry = true;
               
-    //             const newToken = await refreshAccessToken(); 
+    //             const newToken = await refreshAccessToken();
     //             console.log(newToken, 'newToken')
     //             if (newToken) {
     //               originalRequest.headers.Authorization = `Bearer ${newToken}`;

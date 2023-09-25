@@ -3,7 +3,7 @@ import jwt_decode from "jwt-decode";
 import {useNavigate} from "react-router-dom";
 
 
-const AuthContext = createContext();
+const AuthContext = createContext(undefined);
 export default AuthContext;
 
 
@@ -16,18 +16,8 @@ export const AuthProvider = ({children}) => {
     let [loading, setLoading] = useState(true);
 
 
-    const loginUser = async (event) =>  {
-        event.preventDefault();
+    const loginUser = async (username, password) =>  {
 
-        let username = event.target.username.value;
-        let password = event.target.password.value;
-
-        if (!username.length){
-            return {username: 'Введите логин'};
-        }
-        if (!password.length){
-            return {password: 'Введите пароль'};
-        }
 
         let response =  await fetch('http://localhost:8000/api/v1/token/',
         {
@@ -37,22 +27,19 @@ export const AuthProvider = ({children}) => {
             },
           body: JSON.stringify({'username': username, 'password': password})
         });
-        
+
+        let response_status = response.status;
         let response_data = await response.json();
 
-        
-        if (response.status === 200){
+        if (response_status === 200){
             setAccessToken(response_data.access);
             setRefreshToken(response_data.refresh);
             setUser(jwt_decode(response_data.access));
 
             localStorage.setItem('accessToken', response_data.access);
             localStorage.setItem('refreshToken', response_data.refresh);
-            return 200;
         }
-        else {
-            return response_data;
-        }
+        return [response_status, response_data]
     }
 
 
@@ -67,15 +54,10 @@ export const AuthProvider = ({children}) => {
             body: JSON.stringify({'username': username, 'password': password})
             }
         );
+        let response_status = response.status;
         let response_data = await response.json();
-      
-        if (response.status === 200){
-            return 200;
-        }
-        else {
-            console.log(response_data)
-            return response_data;
-        }
+
+        return [response_status, response_data];
       }
 
     
