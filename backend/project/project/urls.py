@@ -39,22 +39,22 @@ urlpatterns = [
         name='profile-read-update',
     ),
     django.urls.path(
-        'chat/all/',
+        'api/v1/chat/all/',
         chat.views.ChatListAPIView.as_view(),
         name='chat-all-list',
     ),
     django.urls.path(
-        'chat/user/<str:username>/',
+        'api/v1/chat/user/<str:username>/',
         chat.views.ChatUserRetrieveAPIView.as_view(),
         name='chat-user-read',
     ),
     django.urls.path(
-        'chat/<int:chat_id>/messages/',
+        'api/v1/chat/<int:chat_id>/messages/',
         chat.views.ChatMessagesListCreateAPIView.as_view(),
         name='messages-list-create',
     ),
     django.urls.path(
-        'message/file/upload/',
+        'api/v1/message/file/upload/',
         chat.views.MessageFileCreateAPIView.as_view(),
         name='message-file-create',
     ),
