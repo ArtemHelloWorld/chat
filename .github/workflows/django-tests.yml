@@ -24,9 +24,9 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r backend/requirements/requirements-prod.txt
-        pip install -r backend/requirements/requirements-dev.txt
-        pip install -r backend/requirements/requirements-test.txt
+        pip install -r backend/requirements/prod.txt
+        pip install -r backend/requirements/dev.txt
+        pip install -r backend/requirements/test.txt
     - name: Creating Environmental File
       run: |
         cd backend/
