@@ -50,17 +50,14 @@ class ChatSerializer(rest_framework.serializers.ModelSerializer):
 
     def get_companion(self, obj):
         sender = self.context['request'].user
-        if sender in obj.users.all():
-            companion_serializer = users.serializers.ProfileSerializer(
-                obj.users.all()[1]
-            )
-        else:
-            companion_serializer = users.serializers.ProfileSerializer(
-                obj.users.all()[0]
-            )
+        chat_members = obj.users.all()
+        companion_serializer = users.serializers.ProfileSerializer(
+            obj.users.all()[1 if chat_members[0] == sender else 0]
+        )
         return companion_serializer.data
 
-    def get_last_message_info(self, obj):
+    @staticmethod
+    def get_last_message_info(obj):
         if obj.last_message:
             return MessageSerializer(obj.last_message).data
         return None
