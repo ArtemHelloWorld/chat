@@ -191,7 +191,7 @@ class ChatConsumer(
 
     def disconnect(self, close_code):
         print('disconnected')
-        self._group_send_i_am_here(os_online=False)
+        self._group_send_i_am_here(is_online=False)
 
         asgiref.sync.async_to_sync(self.channel_layer.group_discard)(
             self.chat_group_name, self.channel_name
