@@ -121,7 +121,7 @@ class HandlersMixin:
     def send(self, text_data=None, bytes_data=None, close=False):
         ...
 
-    def _group_send_i_am_here(self, os_online: bool):
+    def _group_send_i_am_here(self, is_online: bool):
         ...
 
     def i_am_here(self, event):
