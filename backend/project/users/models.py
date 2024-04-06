@@ -11,11 +11,9 @@ class User(django.contrib.auth.models.AbstractUser):
         verbose_name='о себе', null=True, blank=True
     )
     profile_image = django.db.models.ImageField(
+        verbose_name='фотография',
         upload_to='profile_images/%Y/%m/%d',
         default=default_image_path,
-        null=True,
-        blank=True,
-        verbose_name='фотография',
     )
 
     def save(self, *args, **kwargs):
@@ -34,4 +32,4 @@ class User(django.contrib.auth.models.AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ['-date_joined', 'username']
+        ordering = ['-is_staff', '-date_joined', 'username']
