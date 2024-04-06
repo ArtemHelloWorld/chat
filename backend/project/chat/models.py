@@ -38,7 +38,7 @@ class Message(django.db.models.Model):
     class Meta:
         verbose_name = 'сообщение'
         verbose_name_plural = 'сообщения'
-        ordering = ('-sending_timestamp', 'pk')
+        ordering = ('sending_timestamp', 'pk')
 
 
 class MessageFile(django.db.models.Model):
