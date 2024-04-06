@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('chat', '0002_auto_20230907_1928'),
@@ -15,40 +14,72 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='chat',
-            options={'ordering': ('-created_timestamp', 'pk'), 'verbose_name': 'чат', 'verbose_name_plural': 'чаты'},
+            options={
+                'ordering': ('-created_timestamp', 'pk'),
+                'verbose_name': 'чат',
+                'verbose_name_plural': 'чаты',
+            },
         ),
         migrations.AlterModelOptions(
             name='message',
-            options={'ordering': ('-sending_timestamp', 'pk'), 'verbose_name': 'сообщение', 'verbose_name_plural': 'сообщения'},
+            options={
+                'ordering': ('-sending_timestamp', 'pk'),
+                'verbose_name': 'сообщение',
+                'verbose_name_plural': 'сообщения',
+            },
         ),
         migrations.AlterField(
             model_name='chat',
             name='status',
-            field=models.JSONField(default=dict, verbose_name='статус активности пользователей'),
+            field=models.JSONField(
+                default=dict, verbose_name='статус активности пользователей'
+            ),
         ),
         migrations.AlterField(
             model_name='chat',
             name='users',
-            field=models.ManyToManyField(related_name='users', to=settings.AUTH_USER_MODEL, verbose_name='участники'),
+            field=models.ManyToManyField(
+                related_name='users',
+                to=settings.AUTH_USER_MODEL,
+                verbose_name='участники',
+            ),
         ),
         migrations.AlterField(
             model_name='message',
             name='chat',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='chat', to='chat.chat', verbose_name='чат'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='chat',
+                to='chat.chat',
+                verbose_name='чат',
+            ),
         ),
         migrations.AlterField(
             model_name='message',
             name='file',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='file', to='chat.messagefile', verbose_name='прикрепленный файл'),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name='file',
+                to='chat.messagefile',
+                verbose_name='прикрепленный файл',
+            ),
         ),
         migrations.AlterField(
             model_name='message',
             name='is_read',
-            field=models.BooleanField(default=False, verbose_name='статус прочтения'),
+            field=models.BooleanField(
+                default=False, verbose_name='статус прочтения'
+            ),
         ),
         migrations.AlterField(
             model_name='message',
             name='sender',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sender', to=settings.AUTH_USER_MODEL, verbose_name='отправитель'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='sender',
+                to=settings.AUTH_USER_MODEL,
+                verbose_name='отправитель',
+            ),
         ),
     ]

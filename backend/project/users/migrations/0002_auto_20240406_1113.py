@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('users', '0001_initial_squashed_0011_auto_20230905_2316'),
     ]
@@ -12,11 +11,19 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='user',
-            options={'ordering': ['is_staff', '-date_joined', 'username'], 'verbose_name': 'Пользователь', 'verbose_name_plural': 'Пользователи'},
+            options={
+                'ordering': ['is_staff', '-date_joined', 'username'],
+                'verbose_name': 'Пользователь',
+                'verbose_name_plural': 'Пользователи',
+            },
         ),
         migrations.AlterField(
             model_name='user',
             name='profile_image',
-            field=models.ImageField(default='profile_images/default.png', upload_to='profile_images/%Y/%m/%d', verbose_name='фотография'),
+            field=models.ImageField(
+                default='profile_images/default.png',
+                upload_to='profile_images/%Y/%m/%d',
+                verbose_name='фотография',
+            ),
         ),
     ]

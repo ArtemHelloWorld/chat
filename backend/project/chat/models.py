@@ -9,13 +9,13 @@ class Message(django.db.models.Model):
         to='Chat',
         verbose_name='чат',
         on_delete=django.db.models.CASCADE,
-        related_name='chat'
+        related_name='chat',
     )
     sender = django.db.models.ForeignKey(
         to=users.models.User,
         verbose_name='отправитель',
         on_delete=django.db.models.CASCADE,
-        related_name='sender'
+        related_name='sender',
     )
     text = django.db.models.TextField(verbose_name='текст сообщения')
     file = django.db.models.ForeignKey(
@@ -23,15 +23,13 @@ class Message(django.db.models.Model):
         verbose_name='прикрепленный файл',
         null=True,
         on_delete=django.db.models.SET_NULL,
-        related_name='file'
+        related_name='file',
     )
     is_read = django.db.models.BooleanField(
-        verbose_name='статус прочтения',
-        default=False
+        verbose_name='статус прочтения', default=False
     )
     sending_timestamp = core.models.TimestampField(
-        verbose_name='время отправки сообщения',
-        auto_now=True
+        verbose_name='время отправки сообщения', auto_now=True
     )
 
     def __str__(self):
@@ -53,24 +51,21 @@ class MessageFile(django.db.models.Model):
 
 class Chat(django.db.models.Model):
     users = django.db.models.ManyToManyField(
-        to=users.models.User,
-        verbose_name='участники',
-        related_name='users'
+        to=users.models.User, verbose_name='участники', related_name='users'
     )
     last_message = django.db.models.ForeignKey(
         to=Message,
         verbose_name='последнее сообщение',
         null=True,
         on_delete=django.db.models.SET_NULL,
-        related_name='last_message'
+        related_name='last_message',
     )
     status = django.db.models.JSONField(
         default=dict,
         verbose_name='статус активности пользователей',
     )
     created_timestamp = core.models.TimestampField(
-        verbose_name='время создания чата',
-        auto_now=True
+        verbose_name='время создания чата', auto_now=True
     )
 
     def __str__(self):
@@ -80,4 +75,3 @@ class Chat(django.db.models.Model):
         verbose_name = 'чат'
         verbose_name_plural = 'чаты'
         ordering = ('-created_timestamp', 'pk')
-
