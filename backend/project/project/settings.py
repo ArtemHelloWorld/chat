@@ -5,7 +5,7 @@ import pathlib
 import dotenv
 
 dotenv.load_dotenv()
-TRUE_VALUES = {"", "true", "yes", "y", "1"}
+TRUE_VALUES = {'', 'true', 'yes', 'y', '1'}
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
 
@@ -16,7 +16,7 @@ DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in TRUE_VALUES
 EVENTSTREAM_ALLOW_ORIGIN = '*'
 
 ALLOWED_HOSTS = [
-    host.strip() for host in os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(",")
+    host.strip() for host in os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')
 ]
 
 
@@ -54,12 +54,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'project.middleware.custom.RateLimitMiddleware',
+    'project.middleware.RateLimitMiddleware',
 ]
 
-RATE_LIMIT_MIDDLEWARE = os.getenv(
-    'RATE_LIMIT_MIDDLEWARE', 'False'
-).lower() in TRUE_VALUES
+RATE_LIMIT_MIDDLEWARE = (
+    os.getenv('RATE_LIMIT_MIDDLEWARE', 'False').lower() in TRUE_VALUES
+)
 REQUESTS_PER_SECOND = int(os.getenv('REQUESTS_PER_SECOND', 10))
 
 ROOT_URLCONF = 'project.urls'
