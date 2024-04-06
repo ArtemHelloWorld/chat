@@ -37,7 +37,7 @@ function SignUpPage() {
       setPasswordErrors(["Пароли не совпадают"])
     }
     else {
-      const [response_status, response_data] = signUpUser(username, password)
+      const [response_status, response_data] = await signUpUser(username, password)
       if (response_status === 200){
         setSignUpSuccess(true)
       }
