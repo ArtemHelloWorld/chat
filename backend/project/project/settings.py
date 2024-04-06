@@ -5,19 +5,20 @@ import pathlib
 import dotenv
 
 dotenv.load_dotenv()
+TRUE_VALUES = {"", "true", "yes", "y", "1"}
 
 BASE_DIR = pathlib.Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-w30sdst!pi!e$n00rf4iu@')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'some_fake_key')
 
-DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1')
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() in TRUE_VALUES
 
 EVENTSTREAM_ALLOW_ORIGIN = '*'
 
-ALLOWED_HOSTS = os.getenv(
-    'ALLOWED_HOSTS',
-    '127.0.0.1',
-).split(',')
+ALLOWED_HOSTS = [
+    host.strip() for host in os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(",")
+]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -58,7 +59,7 @@ MIDDLEWARE = [
 
 RATE_LIMIT_MIDDLEWARE = os.getenv(
     'RATE_LIMIT_MIDDLEWARE', 'False'
-).lower() in ('active', 'true', '1')
+).lower() in TRUE_VALUES
 REQUESTS_PER_SECOND = int(os.getenv('REQUESTS_PER_SECOND', 10))
 
 ROOT_URLCONF = 'project.urls'
@@ -82,12 +83,12 @@ TEMPLATES = [
 
 DATABASES = {
     'default': {
-        'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('SQL_NAME', 'db.sqlite3'),
-        'USER': os.getenv('SQL_USER', 'user'),
-        'PASSWORD': os.getenv('SQL_PASSWORD', 'password'),
-        'HOST': os.getenv('SQL_HOST', 'localhost'),
-        'PORT': os.getenv('SQL_PORT', '5432'),
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME', 'postgres'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
